@@ -95,7 +95,7 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
           throw new Error(`Decorator @${decorator.getName()} not supported`);
         }
       });
-      
+
     let clazzReplacement: string;
     if (!outClazz.getDefaultKeyword()) {
       // Non default exported class
@@ -208,7 +208,13 @@ const migrateFile = async (project: Project, sourceFile: SourceFile) => {
 export const migrateDirectory = async (directoryPath: string, toSFC: boolean) => {
   const directoryToMigrate = path.join(process.cwd(), directoryPath);
   const project = new Project({});
-  project.addSourceFilesAtPaths(directoryToMigrate + "/**/*.(ts|vue|scss)");
+
+  project.addSourceFilesAtPaths(`${directoryToMigrate}/**/*.(ts|vue|scss)`)
+    .filter(sourceFile =>
+      ![".vue", ".ts"].includes(sourceFile.getExtension())
+      || sourceFile.getFilePath().includes("node_modules")
+    )
+    .forEach(file => project.removeSourceFile(file));
 
   const finalFilesToMigrate = project
     .getSourceFiles()
@@ -237,7 +243,7 @@ export const migrateDirectory = async (directoryPath: string, toSFC: boolean) =>
       .getSourceFiles()
       .filter(
         (file) =>
-          [".vue"].includes(file.getExtension()) && !file.getFilePath().includes("node_modules"),
+          [".vue"].includes(file.getExtension()),
       );
 
     console.log(`Migrating directory: ${directoryToMigrate}, files to SFC`);
