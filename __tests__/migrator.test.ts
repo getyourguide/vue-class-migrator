@@ -13,7 +13,6 @@ describe("migrateFile()", () => {
         project.getSourceFiles().forEach(file => file.deleteImmediatelySync());
     })
 
-
     test('Throws for already migrated file', async () => {
         const sourceFile = createSourceFile();
         await expect(migrateFile(project, sourceFile))
@@ -38,21 +37,6 @@ describe("migrateFile()", () => {
             .toThrow('Class implementing the @Component decorator not found.');
     });
 
-    test('Empty not exported class resolves', async () => {
-        const sourceFile = createSourceFile([
-            "@Component",
-            "class Test {}"
-        ].join("\n"));
-
-        const migratedFile = await migrateFile(project, sourceFile);
-        expect(migratedFile.getText())
-            .toBe([
-                "import { defineComponent } from \"vue\";\n",
-                "const Test = defineComponent({})"
-            ].join("\n")
-            );
-    });
-
     test('Empty @Decorator props resolves', async () => {
         const sourceFile = createSourceFile([
             "@Component({})",
@@ -64,70 +48,6 @@ describe("migrateFile()", () => {
             .toBe([
                 "import { defineComponent } from \"vue\";\n",
                 "const Test = defineComponent({})"
-            ].join("\n")
-            );
-    });
-
-    test('Empty exported class resolves', async () => {
-        const sourceFile = createSourceFile([
-            "@Component",
-            "export class Test {}"
-        ].join("\n"));
-
-        const migratedFile = await migrateFile(project, sourceFile);
-        expect(migratedFile.getText())
-            .toBe([
-                "import { defineComponent } from \"vue\";\n",
-                "export const Test = defineComponent({})"
-            ].join("\n")
-            );
-    });
-
-    test('Empty default exported class resolves', async () => {
-        const sourceFile = createSourceFile([
-            "@Component",
-            "export default class Test {}"
-        ].join("\n"));
-
-        const migratedFile = await migrateFile(project, sourceFile);
-        expect(migratedFile.getText())
-            .toBe([
-                "import { defineComponent } from \"vue\";\n",
-                "export default defineComponent({})"
-            ].join("\n")
-            );
-    });
-
-    test('Non vue import respected', async () => {
-        const sourceFile = createSourceFile([
-            "import Bla, { Blo } from \"./blabla\"",
-            "@Component",
-            "export default class Test {}"
-        ].join("\n"));
-
-        const migratedFile = await migrateFile(project, sourceFile);
-        expect(migratedFile.getText())
-            .toBe([
-                "import Bla, { Blo } from \"./blabla\"",
-                "import { defineComponent } from \"vue\";\n",
-                "export default defineComponent({})"
-            ].join("\n")
-            );
-    });
-
-
-    test('Vue import respected', async () => {
-        const sourceFile = createSourceFile([
-            "import Vue, { mounted } from \"vue\";",
-            "@Component",
-            "export default class Test {}"
-        ].join("\n"));
-
-        const migratedFile = await migrateFile(project, sourceFile);
-        expect(migratedFile.getText())
-            .toBe([
-                "import Vue, { mounted, defineComponent } from \"vue\";",
-                "export default defineComponent({})"
             ].join("\n")
             );
     });
@@ -145,6 +65,87 @@ describe("migrateFile()", () => {
             .toThrow('Property on @Component \"weird\" not supported.');
     });
 
+    describe('Imports & Exports', () => {
+
+        test('Empty not exported class resolves', async () => {
+            const sourceFile = createSourceFile([
+                "@Component",
+                "class Test {}"
+            ].join("\n"));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText())
+                .toBe([
+                    "import { defineComponent } from \"vue\";\n",
+                    "const Test = defineComponent({})"
+                ].join("\n")
+                );
+        });
+
+        test('Empty exported class resolves', async () => {
+            const sourceFile = createSourceFile([
+                "@Component",
+                "export class Test {}"
+            ].join("\n"));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText())
+                .toBe([
+                    "import { defineComponent } from \"vue\";\n",
+                    "export const Test = defineComponent({})"
+                ].join("\n")
+                );
+        });
+
+        test('Empty default exported class resolves', async () => {
+            const sourceFile = createSourceFile([
+                "@Component",
+                "export default class Test {}"
+            ].join("\n"));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText())
+                .toBe([
+                    "import { defineComponent } from \"vue\";\n",
+                    "export default defineComponent({})"
+                ].join("\n")
+                );
+        });
+
+        test('Non vue import respected', async () => {
+            const sourceFile = createSourceFile([
+                "import Bla, { Blo } from \"./blabla\"",
+                "@Component",
+                "export default class Test {}"
+            ].join("\n"));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText())
+                .toBe([
+                    "import Bla, { Blo } from \"./blabla\"",
+                    "import { defineComponent } from \"vue\";\n",
+                    "export default defineComponent({})"
+                ].join("\n")
+                );
+        });
+
+
+        test('Vue import respected', async () => {
+            const sourceFile = createSourceFile([
+                "import Vue, { mounted } from \"vue\";",
+                "@Component",
+                "export default class Test {}"
+            ].join("\n"));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText())
+                .toBe([
+                    "import Vue, { mounted, defineComponent } from \"vue\";",
+                    "export default defineComponent({})"
+                ].join("\n")
+                );
+        });
+    })
 
     describe('Component mixins & extends', () => {
 
@@ -332,6 +333,452 @@ describe("migrateFile()", () => {
                     })`
                         .replaceAll("  ", "")
                 );
+        });
+
+
+        test('Vuex @Prop collision with prop of different type throws', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    @Prop({ type: number })
+                    checkId: MyCheckId;
+                }`
+                    .replaceAll("  ", ""));
+
+            await expect(migrateFile(project, sourceFile))
+                .rejects.toThrow("The @Prop type differs from the typescript type [number, MyCheckId]")
+        });
+
+
+        test('Vuex @Prop collision with prop of same type passes', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    @Prop({ type: String })
+                    checkId: string;
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent, PropType } from "vue";
+    
+                    export default defineComponent({
+                        props: {
+                            checkId: {
+                                type: String
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('Vuex @Prop with type and no typescript type passes', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    @Prop({ type: String })
+                    checkId;
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent, PropType } from "vue";
+    
+                    export default defineComponent({
+                        props: {
+                            checkId: {
+                                type: String
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+    })
+
+    describe('Component Methods', () => {
+
+        test('Special method goes to root', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    created() {
+                        console.log("OK");
+                    }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        created() {
+                            console.log("OK");
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('Method goes to methods', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    created() {
+                        console.log("OK");
+                    }
+                    myMethod(param1: string, p2, p3: any): void {
+                        console.log("hey")
+                    }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        created() {
+                            console.log("OK");
+                        },
+                        methods: {
+                            myMethod(param1: string, p2, p3: any): void {
+                                console.log("hey")
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('Method structure is preserved', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    myMethod(p1: MyType) {
+                        return 3;
+                    }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        methods: {
+                            myMethod(p1: MyType) {
+                                return 3;
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        describe("Vuex @Action", () => {
+            test('Simple @Action', async () => {
+                const sourceFile = createSourceFile(
+                    `@Component
+                    export default class Test extends Vue {
+                        @Action
+                        reload: any;
+                    }`
+                        .replaceAll("  ", ""));
+
+                const migratedFile = await migrateFile(project, sourceFile);
+                expect(migratedFile.getText().replaceAll("  ", ""))
+                    .toBe(
+                        `import { defineComponent } from "vue";
+    
+                        export default defineComponent({
+                            methods: {
+                                reload(): any {
+                                    return this.$store.dispatch("reload");
+                                }
+                            }
+                        })`
+                            .replaceAll("  ", "")
+                    );
+            });
+
+            test('@Action(name)', async () => {
+                const sourceFile = createSourceFile(
+                    `@Component
+                    export default class Test extends Vue {
+                        @Action("myReload")
+                        reload: any;
+                    }`
+                        .replaceAll("  ", ""));
+
+                const migratedFile = await migrateFile(project, sourceFile);
+                expect(migratedFile.getText().replaceAll("  ", ""))
+                    .toBe(
+                        `import { defineComponent } from "vue";
+    
+                        export default defineComponent({
+                            methods: {
+                                reload(): any {
+                                    return this.$store.dispatch("myReload");
+                                }
+                            }
+                        })`
+                            .replaceAll("  ", "")
+                    );
+            });
+
+
+            test('@Action(name, {namespace})', async () => {
+                const sourceFile = createSourceFile(
+                    `@Component
+                    export default class Test extends Vue {
+                        @Action("myReload", { namespace: "reloadNamespace" })
+                        reload: any;
+                    }`
+                        .replaceAll("  ", ""));
+
+                const migratedFile = await migrateFile(project, sourceFile);
+                expect(migratedFile.getText().replaceAll("  ", ""))
+                    .toBe(
+                        `import { defineComponent } from "vue";
+    
+                        export default defineComponent({
+                            methods: {
+                                reload(): any {
+                                    return this.$store.dispatch("reloadNamespace/myReload");
+                                }
+                            }
+                        })`
+                            .replaceAll("  ", "")
+                    );
+            });
+
+            test('@Action(name, {namespace}) with type', async () => {
+                const sourceFile = createSourceFile(
+                    `@Component
+                    export default class Test extends Vue {
+                        @Action("myReload", { namespace: "reloadNamespace" })
+                        reload: (p1: string, p2, p3: number) => number;
+                    }`
+                        .replaceAll("  ", ""));
+
+                const migratedFile = await migrateFile(project, sourceFile);
+                expect(migratedFile.getText().replaceAll("  ", ""))
+                    .toBe(
+                        `import { defineComponent } from "vue";
+    
+                        export default defineComponent({
+                            methods: {
+                                reload(p1: string, p2, p3: number): Promise<number> {
+                                    return this.$store.dispatch("reloadNamespace/myReload", p1, p2, p3);
+                                }
+                            }
+                        })`
+                            .replaceAll("  ", "")
+                    );
+            });
+        })
+
+        // TODO Support @Component methods
+
+    })
+
+    describe('Component data', () => {
+
+        test('Class data() method is replicated', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    data() {
+                        return "works";
+                    };
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        data() {
+                            return "works";
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('Class properties are included as data', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    myProp: number;
+                    myProp2;
+                    myProp3 = false;
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        data() {
+                            return {
+                                myProp: undefined as number,
+                                myProp2: undefined,
+                                myProp3: false
+                            };
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('@Comoponent data is suported', async () => {
+            const sourceFile = createSourceFile(
+                `@Component({
+                    data() {
+                        return {
+                            sun,
+                            moon: false
+                        }
+                    }
+                })
+                export default class Test extends Vue {}`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        data() {
+                            return {
+                                sun,
+                                moon: false
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('class data() & class data gets combined', async () => {
+            const sourceFile = createSourceFile(
+                `@Component()
+                export default class Test extends Vue {
+                    hello = true;
+                    goodbye: string;
+                    data() {
+                        return {
+                            sun,
+                            moon: false
+                        }
+                    }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        data() {
+                            return {
+                                sun,
+                                moon: false,
+                                hello: true,
+                                goodbye: undefined as string
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('@Component data & class data gets combined', async () => {
+            const sourceFile = createSourceFile(
+                `@Component({
+                    data() {
+                        return {
+                            sun,
+                            moon: {
+                                out: false
+                            }
+                        }
+                    }
+                })
+                export default class Test extends Vue {
+                    hello = true;
+                    goodbye: string;
+                    salutation: {
+                        show: string
+                    }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        data() {
+                            return {
+                                sun,
+                                moon: {
+                                    out: false
+                                },
+                                hello: true,
+                                goodbye: undefined as string,
+                                salutation: undefined as {
+                                    show: string
+                                }
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('Class data() & @Component({data():...}) throws', async () => {
+            const sourceFile = createSourceFile(
+                `@Component({
+                    data() {
+                        return {
+                            sun,
+                            moon: false
+                        }
+                    }
+                })
+                export default class Test extends Vue {
+                    data() {
+                        return {
+                            hello: false,
+                            goodbye
+                        }
+                    }
+                }`
+                    .replaceAll("  ", ""));
+
+            await expect(migrateFile(project, sourceFile))
+                .rejects
+                .toThrow("Having a class with the data() method and the @Component({data(): ...} at the same time is not supported.");
         });
 
     })

@@ -1,4 +1,4 @@
-import { ObjectLiteralExpression, SyntaxKind } from "ts-morph";
+import { MethodDeclaration, ObjectLiteralExpression, SyntaxKind } from "ts-morph";
 import { MigratePartProps } from "./migrator";
 
 // TODO Add support for @Component({data() ...})
@@ -6,21 +6,35 @@ export default (migratePartProps: MigratePartProps) => {
   const { clazz, mainObject } = migratePartProps;
   // Class properties go to the data property
   const classPropertyData = clazz.getProperties().filter((prop) => !prop.getDecorators().length);
+  const clazzDataMethod = clazz.getMethod("data");
+  const componentDecoratorDataMethod = mainObject.getProperty("data");
 
-  // Is there a method called data?
-  let dataMethod = clazz.getMethod("data");
+  if (clazzDataMethod && componentDecoratorDataMethod) {
+    throw new Error("Having a class with the data() method and the @Component({data(): ...} at the same time is not supported.")
+  }
+
+  let dataMethod: MethodDeclaration | undefined;
   let returnObject: ObjectLiteralExpression | undefined;
 
-  if (dataMethod) {
+  if (clazzDataMethod) {
     dataMethod = mainObject.addMethod({
-      name: dataMethod.getName(),
-      parameters: dataMethod.getParameters().map((p) => p.getStructure()),
-      isAsync: dataMethod.isAsync(),
-      returnType: dataMethod.getReturnTypeNode()?.getText(),
-      statements: dataMethod.getBodyText(),
+      name: clazzDataMethod.getName(),
+      parameters: clazzDataMethod.getParameters().map((p) => p.getStructure()),
+      isAsync: clazzDataMethod.isAsync(),
+      returnType: clazzDataMethod.getReturnTypeNode()?.getText(),
+      statements: clazzDataMethod.getBodyText(),
     });
 
     returnObject = dataMethod.getDescendantsOfKind(SyntaxKind.ObjectLiteralExpression).pop();
+  } else if (componentDecoratorDataMethod) {
+    dataMethod = componentDecoratorDataMethod.asKindOrThrow(SyntaxKind.MethodDeclaration);
+    const returnStatements = dataMethod.getDescendantsOfKind(SyntaxKind.ReturnStatement);
+    if (returnStatements.length !== 1) {
+      throw new Error("The data() funcion must have only one return statement;")
+    }
+    returnObject = returnStatements
+      .pop()
+      .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression);
   }
 
   if (classPropertyData.length) {

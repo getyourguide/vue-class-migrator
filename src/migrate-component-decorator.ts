@@ -1,3 +1,4 @@
+import { SyntaxKind } from "ts-morph";
 import { MigratePartProps, supportedComponentProps } from "./migrator";
 
 // Adds the content from @Component({...})
@@ -9,13 +10,18 @@ export default (migratePartProps: MigratePartProps) => {
     console.error(`Class ${clazz.getName()} doesn't have a component decorator.`);
     return;
   }
+  const componentProperties = decorator
+    .getArguments()
+    .pop()
+    ?.asKindOrThrow(SyntaxKind.ObjectLiteralExpression)
+    .getProperties() || [];
 
-  (decorator.getArguments()[0] as any)?.getProperties().forEach((prop: any) => {
-    const propName = prop.getName();
-    const value = prop.getInitializer ? prop.getInitializer()?.getText() : undefined;
-    if (value != "{}" && value != "[]") {
-      if (supportedComponentProps.includes(propName) && prop.getInitializer) {
 
+  componentProperties.forEach((prop) => {
+
+    if (prop.isKind(SyntaxKind.PropertyAssignment)) {
+      const propName = prop.getName();
+      if (supportedComponentProps.includes(propName)) {
         if (prop.getInitializer()) {
           mainObject.addPropertyAssignment({
             name: propName,
@@ -29,6 +35,21 @@ export default (migratePartProps: MigratePartProps) => {
       } else {
         throw new Error(`Property on @Component "${propName}" not supported.`);
       }
+    } else if (prop.isKind(SyntaxKind.MethodDeclaration)) {
+      const propName = prop.getName();
+      if (supportedComponentProps.includes(propName)) {
+        mainObject.addMethod({
+          name: prop.getName(),
+          parameters: prop.getParameters().map((p) => p.getStructure()),
+          isAsync: prop.isAsync(),
+          returnType: prop.getReturnTypeNode()?.getText(),
+          statements: prop.getBodyText(),
+        });
+      } else {
+        throw new Error(`Method on @Component "${propName}" not supported.`);
+      }
+    } else {
+      throw new Error(`Property on @Component "${prop.getKindName()}" not supported.`)
     }
   });
 };

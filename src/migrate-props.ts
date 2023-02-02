@@ -25,6 +25,7 @@ export default (migratePartProps: MigratePartProps) => {
         componentProp.getDecorator("Prop")?.getArguments()[0] ||
         ({ getProperties: () => [] } as any);
 
+      let propertyType: string | undefined
       argument.getProperties().map((prop: any) => {
         const propName = prop.getName();
         if (supportedPropDecoratorProps.includes(propName)) {
@@ -32,24 +33,36 @@ export default (migratePartProps: MigratePartProps) => {
             name: propName,
             initializer: prop.getInitializerOrThrow().getText(),
           });
+
+          if (propName === "type") {
+            propertyType = prop.getInitializer().getText()
+          }
         } else {
           throw new Error(`Property "${propName}" not supported.`);
         }
       });
 
       // For primitive types we can make it pretier.
-      const propertyType = componentProp.getType().getText();
-      const propertyConstructorMapping: Record<string, string> = {
-        string: "String",
-        boolean: "Boolean",
-        number: "Number",
-        any: "any",
-      };
-      propObject.addPropertyAssignment({
-        name: "type",
-        initializer:
-          propertyConstructorMapping[propertyType] ?? `Object as PropType<${propertyType}>`,
-      });
+      if (!propertyType) {
+        propertyType = componentProp.getTypeNode().getText();
+        const propertyConstructorMapping: Record<string, string> = {
+          string: "String",
+          boolean: "Boolean",
+          number: "Number",
+          any: "any",
+        };
+        propObject.addPropertyAssignment({
+          name: "type",
+          initializer:
+            propertyConstructorMapping[propertyType] ?? `Object as PropType<${propertyType}>`,
+        });
+      } else {
+        const tsPropertyType = componentProp.getTypeNode()?.getText();
+        // Is there type collision? e.g. @Prop({type: Number}) myprop: string
+        if (tsPropertyType && propertyType.toLowerCase() !== tsPropertyType.toLowerCase()) {
+          throw new Error(`The @Prop type differs from the typescript type [${propertyType}, ${tsPropertyType}]`)
+        }
+      }
     }
   }
 };
