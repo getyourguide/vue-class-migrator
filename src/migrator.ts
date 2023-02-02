@@ -41,7 +41,7 @@ export const specialMethods = [
   "serverPrefetch",
 ]; // Vue methods that won't be included under methods: {...}, they go to the root.
 export const supportedDecorators = ["Prop", "Getter", "Action"]; // Class Property decorators
-export const supportedComponentProps = ["name", "components", "mixins", "store"]; // @Component properties, empty ignored. e.g. props: {}
+export const supportedComponentProps = ["name", "components", "mixins", "store", "props"]; // @Component properties, empty ignored. e.g. props: {}
 export const supportedPropDecoratorProps = ["default", "required"]; // @Prop("", {...})
 export const supportedGetterOptions = ["namespace"]; // @Getter("", {...})
 export const supportedActionOptions = ["namespace"]; // @Action("", {...})
@@ -101,7 +101,7 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
       // Non default exported class
       clazzReplacement = [
         outClazz?.getExportKeyword()?.getText(),
-        `const ${outClazz.getName()} = `,
+        `const ${outClazz.getName()} =`,
         "defineComponent({})",
       ]
         .filter((s) => s)
@@ -186,7 +186,7 @@ const migrateVueFile = async (project: Project, vueSourceFile: SourceFile) => {
   }
 };
 
-const migrateFile = async (project: Project, sourceFile: SourceFile) => {
+export const migrateFile = async (project: Project, sourceFile: SourceFile) => {
   console.log(`Migrating ${sourceFile.getBaseName()}`);
   if (!sourceFile.getText().includes("@Component")) {
     throw new Error("File already migrated");

@@ -1,5 +1,5 @@
 import { SyntaxKind } from "ts-morph";
-import { MigratePartProps, supportedPropDecoratorProps } from "./migrator";
+import { getObjectProperty, MigratePartProps, supportedPropDecoratorProps } from "./migrator";
 
 export default (migratePartProps: MigratePartProps) => {
   const { clazz, mainObject, outFile } = migratePartProps;
@@ -7,12 +7,8 @@ export default (migratePartProps: MigratePartProps) => {
   const props = clazz.getProperties().filter((prop) => prop.getDecorator("Prop"));
 
   if (props.length) {
-    const propsObject = mainObject
-      .addPropertyAssignment({
-        name: "props",
-        initializer: "{}",
-      })
-      .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression)!;
+
+    const propsObject = getObjectProperty(mainObject, "props");
 
     outFile
       .getImportDeclaration((imp) => imp.getModuleSpecifierValue() === "vue")
@@ -26,7 +22,7 @@ export default (migratePartProps: MigratePartProps) => {
         .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression)!;
 
       const argument =
-        componentProp.getDecorator("prop")?.getArguments()[0] ||
+        componentProp.getDecorator("Prop")?.getArguments()[0] ||
         ({ getProperties: () => [] } as any);
 
       argument.getProperties().map((prop: any) => {
@@ -47,6 +43,7 @@ export default (migratePartProps: MigratePartProps) => {
         string: "String",
         boolean: "Boolean",
         number: "Number",
+        any: "any",
       };
       propObject.addPropertyAssignment({
         name: "type",

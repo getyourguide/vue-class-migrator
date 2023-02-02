@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "lib": ["esnext"],
+    "lib": ["ESNext"],
     "module": "NodeNext",
     "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "include": ["**/*"],
   "exclude": ["node_modules", "dist"],
   "ts-node": {
     "transpileOnly": true,
-    "ignore": ["node_modules/!(@getyourguide)"]
   }
 }
