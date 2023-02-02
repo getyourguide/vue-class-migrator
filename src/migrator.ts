@@ -95,14 +95,26 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
           throw new Error(`Decorator @${decorator.getName()} not supported`);
         }
       });
-
-    const clazzReplacement = [
-      outClazz?.getExportKeyword()?.getText(),
-      outClazz?.getDefaultKeywordOrThrow()?.getText(),
-      "defineComponent({})",
-    ]
-      .filter((s) => s)
-      .join(" ");
+      
+    let clazzReplacement: string;
+    if (!outClazz.getDefaultKeyword()) {
+      // Non default exported class
+      clazzReplacement = [
+        outClazz?.getExportKeyword()?.getText(),
+        `const ${outClazz.getName()} = `,
+        "defineComponent({})",
+      ]
+        .filter((s) => s)
+        .join(" ");
+    } else {
+      clazzReplacement = [
+        outClazz?.getExportKeyword()?.getText(),
+        outClazz?.getDefaultKeywordOrThrow()?.getText(),
+        "defineComponent({})",
+      ]
+        .filter((s) => s)
+        .join(" ");
+    }
 
     // Main structure
     const mainObject = outClazz
