@@ -1,0 +1,33 @@
+{
+  "name": "vue-migrator",
+  "version": "0.0.1",
+  "description": "Library that accelerates the process to migrate to Vue 3.",
+  "main": "index.ts",
+  "scripts": {
+    "migrate": "esno index.ts",
+    "lint": "eslint src"
+  },
+  "keywords": [],
+  "author": "Catalog",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/getyourguide/vue-migrator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/getyourguide/vue-migrator/issues"
+  },
+  "homepage": "https://github.com/getyourguide/vue-migrator#readme",
+  "devDependencies": {
+    "@types/eslint": "7.28.0",
+    "@types/glob": "7.2.0",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
+    "commander": "^10.0.0",
+    "eslint": "7.32.0",
+    "esno": "^0.16.3",
+    "glob": "7.1.6",
+    "ts-morph": "^17.0.1",
+    "typescript": "^4.9.5"
+  }
+}

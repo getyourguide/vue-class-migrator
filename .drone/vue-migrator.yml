@@ -1,0 +1,15 @@
+clone:
+  clone:
+    image: 890546402176.dkr.ecr.eu-central-1.amazonaws.com/hubdockercom/plugins/git
+
+pipeline:
+  install-dependencies:
+    image: 130607246975.dkr.ecr.eu-central-1.amazonaws.com/base/node:16-ts
+    commands:
+      - pnpm install
+    when:
+      event: push
+  lint:
+    image: 130607246975.dkr.ecr.eu-central-1.amazonaws.com/base/node:16-ts
+    commands:
+      - pnpm lint
