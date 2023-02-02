@@ -12,7 +12,7 @@ Accepted options
 
 ```
 // e.g. Assuming gygadmin repository being a sibling of vue-migrator.
-
+pnpm install
 pnpm run migrate -- -d ../gygadmin/apps/catalog/client/pages/views/activities/detail/components
 ```
 
