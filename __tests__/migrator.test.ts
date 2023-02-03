@@ -210,7 +210,25 @@ describe("migrateFile()", () => {
     })
 
     describe('Component Properties', () => {
+        test('Short hand assignment', async () => {
+            const sourceFile = createSourceFile(
+                `@Component({
+                    props
+                })
+                export default class Test extends Vue {}`
+                    .replaceAll("  ", ""));
 
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        props
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
         test('@Component props become properties', async () => {
             const sourceFile = createSourceFile(
                 `@Component({
@@ -219,7 +237,8 @@ describe("migrateFile()", () => {
                         default: true,
                         required: false,
                         type: String
-                    }
+                    },
+                    shortHand
                 }
             })
             export default class Test extends Vue {}`
@@ -236,7 +255,8 @@ describe("migrateFile()", () => {
                             default: true,
                             required: false,
                             type: String
-                        }
+                        },
+                        shortHand
                     }
                 })`
                         .replaceAll("  ", "")
@@ -781,6 +801,59 @@ describe("migrateFile()", () => {
                 .toThrow("Having a class with the data() method and the @Component({data(): ...} at the same time is not supported.");
         });
 
+    })
+
+
+    describe('Component references', () => {
+        test('@Ref simple decorator is translated', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    @Ref()
+                    readonly defaultInput!: HTMLInputElement;                  
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        computed: {
+                            defaultInput(): HTMLInputElement {
+                                return this.$refs.defaultInput;
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('@Ref complex decorator is translated', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    @Ref("actualRef")
+                    readonly defaultInput!: HTMLInputElement;                  
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        computed: {
+                            defaultInput(): HTMLInputElement {
+                                return this.$refs.actualRef;
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
     })
 
 })

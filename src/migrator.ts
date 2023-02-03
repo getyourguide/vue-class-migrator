@@ -16,6 +16,7 @@ import migrateWatchers from "./migrate-watchers";
 import migrateExtends from "./migrate-extends";
 import { getScriptContent, injectScript, vueFileToSFC } from "./migrator-to-sfc";
 import migrateSetters from "./migrate-setters";
+import migrateRefs from "./migrate-refs";
 
 export interface MigratePartProps {
   clazz: ClassDeclaration;
@@ -40,8 +41,8 @@ export const specialMethods = [
   "deactivated",
   "serverPrefetch",
 ]; // Vue methods that won't be included under methods: {...}, they go to the root.
-export const supportedDecorators = ["Prop", "Getter", "Action"]; // Class Property decorators
-export const supportedComponentProps = ["name", "components", "mixins", "store", "props", "data"]; // @Component properties, empty ignored. e.g. props: {}
+export const supportedDecorators = ["Prop", "Getter", "Action", "Ref"]; // Class Property decorators
+export const supportedComponentProps = ["name", "components", "mixins", "store", "props", "data", "computed"]; // @Component properties, empty ignored. e.g. props: {}
 export const supportedPropDecoratorProps = ["default", "required", "type"]; // @Prop("", {...})
 export const supportedGetterOptions = ["namespace"]; // @Getter("", {...})
 export const supportedActionOptions = ["namespace"]; // @Action("", {...})
@@ -156,6 +157,9 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
     // Methods property (includes Vuex @Action)
     // TODO Watch out, sometimes methods are actually computed properties
     migrateMethods(migratePartProps);
+
+    // @Ref
+    migrateRefs(migratePartProps);
   } catch (error) {
     await outFile.deleteImmediately();
     throw error;

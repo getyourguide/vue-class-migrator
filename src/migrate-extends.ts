@@ -1,3 +1,4 @@
+import { SyntaxKind } from "ts-morph";
 import { MigratePartProps } from "./migrator";
 
 export default (migratePartProps: MigratePartProps) => {
@@ -13,9 +14,25 @@ export default (migratePartProps: MigratePartProps) => {
       );
     }
 
-    mainObject.addPropertyAssignment({
-      name: "extends",
-      initializer: classExtend,
-    });
+    const mixinsCallExpression = clazz.getExtends()?.getFirstDescendantByKind(SyntaxKind.CallExpression);
+    if (mixinsCallExpression) {
+
+      if (mainObject.getProperty("mixins")) {
+        throw new Error("class extending from mixins() and mixins already present. This is not supported yet.");
+        // TODO combine the existing mixings by appending .concat(newMixins);
+      }
+      const mixins = mixinsCallExpression.getArguments().map(arg => arg.getText());
+      mainObject.addPropertyAssignment({
+        name: "mixins",
+        initializer: `[${mixins.join(", ")}]`
+      })
+
+    } else {
+      mainObject.addPropertyAssignment({
+        name: "extends",
+        initializer: classExtend,
+      });
+    }
+
   }
 };

@@ -27,10 +27,6 @@ export default (migratePartProps: MigratePartProps) => {
             name: propName,
             initializer: prop.getInitializer().getText(),
           });
-        } else {
-          mainObject.addShorthandPropertyAssignment({
-            name: propName,
-          });
         }
       } else {
         throw new Error(`Property on @Component "${propName}" not supported.`);
@@ -48,6 +44,13 @@ export default (migratePartProps: MigratePartProps) => {
       } else {
         throw new Error(`Method on @Component "${propName}" not supported.`);
       }
+    } else if(prop.isKind(SyntaxKind.ShorthandPropertyAssignment)) {
+      if (!supportedComponentProps.includes(prop.getName())) {
+        throw new Error(`Method on @Component "${prop.getName()}" not supported.`);
+      }
+      mainObject.addShorthandPropertyAssignment({
+        name: prop.getName(),
+      });
     } else {
       throw new Error(`Property on @Component "${prop.getKindName()}" not supported.`)
     }
