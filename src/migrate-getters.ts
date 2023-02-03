@@ -39,7 +39,7 @@ export default (migratePartProps: MigratePartProps) => {
       const propertyType = vuexGetter.getTypeNode()?.getText();
       const getterName = (
         namespace ? [namespace, getterMethodName].join("/") : getterMethodName
-      ).replaceAll('"', "");
+      ).replace(/"/g, "");
       computedObject!.addMethod({
         name: vuexGetter.getName(),
         returnType: propertyType,

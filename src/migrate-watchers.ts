@@ -12,29 +12,43 @@ export default (migratePartProps: MigratePartProps) => {
 
     for (const watcher of watchers) {
       const decoratorArgs = watcher.getDecorator("Watch")?.getArguments() || [];
-      const watchedProperty = decoratorArgs[0].getText(); //.replaceAll("\"", "");
+      const rawWatchedProp = decoratorArgs[0].getText();
+      const watchedProperty = !rawWatchedProp.includes('.')
+          ? rawWatchedProp.replace(/"/g, "")
+          : rawWatchedProp; //.replaceAll("\"", "");
       const watchProperties = (decoratorArgs[1] as any)?.getProperties() || [];
-      const watcherObject = watchMainObject
-        .addPropertyAssignment({
+
+      if (!watchProperties.length) {
+        watchMainObject.addMethod({
           name: watchedProperty,
-          initializer: "{}",
+          parameters: watcher.getParameters().map((p) => p.getStructure()),
+          isAsync: watcher.isAsync(),
+          returnType: watcher.getReturnTypeNode()?.getText(),
+          statements: watcher.getBodyText(),
         })
-        .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression)!;
+      } else {
+        const watcherObject = watchMainObject
+            .addPropertyAssignment({
+              name: watchedProperty,
+              initializer: "{}",
+            })
+            .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression)!;
 
-      watchProperties.forEach((prop: any) => {
-        watcherObject.addPropertyAssignment({
-          name: prop.getName(),
-          initializer: prop.getInitializerOrThrow().getText(),
+        watchProperties.forEach((prop: any) => {
+          watcherObject.addPropertyAssignment({
+            name: prop.getName(),
+            initializer: prop.getInitializerOrThrow().getText(),
+          });
         });
-      });
 
-      watcherObject.addMethod({
-        name: "handler", // TODO Sometimes data becomes $data
-        parameters: watcher.getParameters().map((p) => p.getStructure()),
-        isAsync: watcher.isAsync(),
-        returnType: watcher.getReturnTypeNode()?.getText(),
-        statements: watcher.getBodyText(),
-      });
+        watcherObject.addMethod({
+          name: "handler", // TODO Sometimes data becomes $data
+          parameters: watcher.getParameters().map((p) => p.getStructure()),
+          isAsync: watcher.isAsync(),
+          returnType: watcher.getReturnTypeNode()?.getText(),
+          statements: watcher.getBodyText(),
+        });
+      }
     }
   }
 };
