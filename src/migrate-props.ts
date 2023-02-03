@@ -70,10 +70,11 @@ export default (migratePartProps: MigratePartProps) => {
           number: "Number",
           any: "any",
         };
+        const fallbackType = propertyType.match(/^Array|\[\]$/) ? "Array" : "Object";
         propObject.addPropertyAssignment({
           name: "type",
           initializer:
-            propertyConstructorMapping[propertyType] ?? `Object as PropType<${propertyType}>`,
+            propertyConstructorMapping[propertyType] ?? `${fallbackType} as PropType<${propertyType}>`,
         });
       } else {
         const tsPropertyType = componentProp.getTypeNode()?.getText();
