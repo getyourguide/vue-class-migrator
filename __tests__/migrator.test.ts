@@ -965,4 +965,96 @@ describe("migrateFile()", () => {
         });
     })
 
+
+    describe('Component getters & setters', () => {
+        test('get becomes computed property', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    get params(): string {
+                        return "hello";
+                      }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        computed: {
+                            params(): string {
+                                return "hello";
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+        test('set becomes watch property', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    set params(p1: string): void {
+                        this.$emit("change", p1);
+                      }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        watch: {
+                            params: {
+                                handler(p1: string): void {
+                                    this.$emit("change", p1);
+                                }
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+
+        test('get & set becomes computed property', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    get params(): string {
+                        return "hello";
+                    }
+                    set params(p1: string): void {
+                        this.$emit("change", p1);
+                    }
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        computed: {
+                            params: {
+                                get(): string {
+                                    return "hello";
+                                },
+                                set(p1: string): void {
+                                    this.$emit("change", p1);
+                                }
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
+    })
 })

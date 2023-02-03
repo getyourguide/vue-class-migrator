@@ -1,3 +1,4 @@
+import { SyntaxKind } from "ts-morph";
 import { getObjectProperty, MigratePartProps, supportedGetterOptions } from "./migrator";
 
 export default (migratePartProps: MigratePartProps) => {
@@ -8,11 +9,28 @@ export default (migratePartProps: MigratePartProps) => {
     const computedObject = getObjectProperty(mainObject, "computed");
 
     for (const getter of getters) {
-      computedObject.addMethod({
-        name: getter.getName(),
-        returnType: getter.getReturnTypeNode()?.getText(),
-        statements: getter.getBodyText(),
-      });
+      const getterName = getter.getName();
+
+      if (clazz.getSetAccessor(getterName)) {
+        const propObject = computedObject.addPropertyAssignment({
+          name: getterName,
+          initializer: '{}'
+        }).getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression);
+
+        propObject.addMethod({
+          name: 'get',
+          returnType: getter.getReturnTypeNode()?.getText(),
+          statements: getter.getBodyText(),
+        })
+
+      } else {
+        computedObject.addMethod({
+          name: getterName,
+          returnType: getter.getReturnTypeNode()?.getText(),
+          statements: getter.getBodyText(),
+        });
+      }
+
     }
   }
 
