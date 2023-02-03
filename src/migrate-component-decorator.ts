@@ -22,11 +22,15 @@ export default (migratePartProps: MigratePartProps) => {
     if (prop.isKind(SyntaxKind.PropertyAssignment)) {
       const propName = prop.getName();
       if (supportedComponentProps.includes(propName)) {
-        if (prop.getInitializer()) {
-          mainObject.addPropertyAssignment({
-            name: propName,
-            initializer: prop.getInitializer().getText(),
-          });
+        const initializer = prop.getInitializer();
+        if (initializer) {
+          // ignore empty props
+          if (propName !== 'props' || initializer.getText() !== '{}') {
+            mainObject.addPropertyAssignment({
+              name: propName,
+              initializer: initializer.getText(),
+            });
+          }
         }
       } else {
         throw new Error(`Property on @Component "${propName}" not supported.`);

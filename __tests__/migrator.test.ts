@@ -262,6 +262,26 @@ describe("migrateFile()", () => {
                         .replaceAll("  ", "")
                 );
         });
+        test('Empty @Component props are ignored', async () => {
+            const sourceFile = createSourceFile(
+                `@Component({
+                name: "test",
+                props: {}
+            })
+            export default class Test extends Vue {}`
+                    .replaceAll("  ", "")
+            );
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                export default defineComponent({
+                    name: "test"
+                })`
+                        .replaceAll("  ", "")
+                );
+        });
         test('Class @Prop  with method assignment become properties', async () => {
             const sourceFile = createSourceFile(
                 `@Component()
