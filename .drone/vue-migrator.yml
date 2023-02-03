@@ -13,7 +13,11 @@ pipeline:
     image: 130607246975.dkr.ecr.eu-central-1.amazonaws.com/base/node:16-ts
     commands:
       - pnpm lint
+    when:
+      event: push
   test:
     image: 130607246975.dkr.ecr.eu-central-1.amazonaws.com/base/node:16-ts
     commands:
       - pnpm test
+    when:
+      event: push
