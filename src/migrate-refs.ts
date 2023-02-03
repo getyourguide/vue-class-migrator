@@ -1,4 +1,3 @@
-import { SyntaxKind } from "ts-morph";
 import { getObjectProperty, MigratePartProps } from "./migrator";
 
 export default (migratePartProps: MigratePartProps) => {
