@@ -21,26 +21,45 @@ export default (migratePartProps: MigratePartProps) => {
         })
         .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression)!;
 
-      const argument =
-        componentProp.getDecorator("Prop")?.getArguments()[0] ||
-        ({ getProperties: () => [] } as any);
+      const argument = componentProp.getDecorator("Prop")?.getArguments()[0];
+      let propertyType: string | undefined;
+      if (argument) {
+        argument.asKindOrThrow(SyntaxKind.ObjectLiteralExpression)
+          .getProperties()
+          .map((prop) => {
+            if (prop.isKind(SyntaxKind.PropertyAssignment)) {
+              const propName = prop.getName();
+              if (supportedPropDecoratorProps.includes(propName)) {
+                propObject.addPropertyAssignment({
+                  name: propName,
+                  initializer: prop.getInitializer()?.getText(),
+                });
 
-      let propertyType: string | undefined
-      argument.getProperties().map((prop: any) => {
-        const propName = prop.getName();
-        if (supportedPropDecoratorProps.includes(propName)) {
-          propObject.addPropertyAssignment({
-            name: propName,
-            initializer: prop.getInitializerOrThrow().getText(),
+                if (propName === "type") {
+                  propertyType = prop.getInitializer().getText()
+                }
+              } else {
+                throw new Error(`Property "${propName}" not supported.`);
+              }
+            } else if (prop.isKind(SyntaxKind.MethodDeclaration)) {
+              // Method declaration
+              const propName = prop.getName();
+              if (supportedPropDecoratorProps.includes(propName)) {
+                propObject.addMethod({
+                  name: propName,
+                  parameters: prop.getParameters().map((p) => p.getStructure()),
+                  isAsync: prop.isAsync(),
+                  returnType: prop.getReturnTypeNode()?.getText(),
+                  statements: prop.getBodyText(),
+                });
+              } else {
+                throw new Error(`Property "${propName}" not supported.`);
+              }
+            } else {
+              throw new Error(`Property "${(prop as any).getName ? (prop as any).getName() : ''}" has a non supported assignment.`);
+            }
           });
-
-          if (propName === "type") {
-            propertyType = prop.getInitializer().getText()
-          }
-        } else {
-          throw new Error(`Property "${propName}" not supported.`);
-        }
-      });
+      }
 
       // For primitive types we can make it pretier.
       if (!propertyType) {
@@ -60,7 +79,7 @@ export default (migratePartProps: MigratePartProps) => {
         const tsPropertyType = componentProp.getTypeNode()?.getText();
         // Is there type collision? e.g. @Prop({type: Number}) myprop: string
         if (tsPropertyType && propertyType.toLowerCase() !== tsPropertyType.toLowerCase()) {
-          throw new Error(`The @Prop type differs from the typescript type [${propertyType}, ${tsPropertyType}]`)
+          console.warn(`The @Prop type differs from the typescript type [${propertyType}, ${tsPropertyType}]`)
         }
       }
     }
