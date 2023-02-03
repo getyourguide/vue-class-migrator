@@ -1,4 +1,4 @@
-import { SyntaxKind } from "ts-morph";
+import { SyntaxKind, Node } from "ts-morph";
 import { getObjectProperty, MigratePartProps, supportedPropDecoratorProps } from "./migrator";
 
 export default (migratePartProps: MigratePartProps) => {
@@ -63,17 +63,20 @@ export default (migratePartProps: MigratePartProps) => {
 
       // For primitive types we can make it pretier.
       if (!propertyType) {
-        propertyType = componentProp.getTypeNode().getText();
+        const propTypeNode = componentProp.getTypeNode();
+        propertyType = propTypeNode.getText();
+        const isArray = Node.isArrayTypeNode(propTypeNode);
         const propertyConstructorMapping: Record<string, string> = {
           string: "String",
           boolean: "Boolean",
           number: "Number",
           any: "any",
         };
+        const fallbackType = isArray ? "Array" : "Object";
         propObject.addPropertyAssignment({
           name: "type",
           initializer:
-            propertyConstructorMapping[propertyType] ?? `Object as PropType<${propertyType}>`,
+            propertyConstructorMapping[propertyType] ?? `${fallbackType} as PropType<${propertyType}>`,
         });
       } else {
         const tsPropertyType = componentProp.getTypeNode()?.getText();
