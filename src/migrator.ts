@@ -43,7 +43,7 @@ export const specialMethods = [
   "destroyed"
 ]; // Vue methods that won't be included under methods: {...}, they go to the root.
 export const supportedDecorators = ["Prop", "Getter", "Action", "Ref"]; // Class Property decorators
-export const supportedComponentProps = ["name", "components", "mixins", "store", "props", "data", "computed"]; // @Component properties, empty ignored. e.g. props: {}
+export const supportedComponentProps = ["name", "components", "methods", "mixins", "store", "props", "data", "computed"]; // @Component properties, empty ignored. e.g. props: {}
 export const supportedPropDecoratorProps = ["default", "required", "type"]; // @Prop("", {...})
 export const supportedGetterOptions = ["namespace"]; // @Getter("", {...})
 export const supportedActionOptions = ["namespace"]; // @Action("", {...})
