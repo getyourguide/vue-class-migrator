@@ -11,7 +11,7 @@ export default (migratePartProps: MigratePartProps) => {
 
     for (const reference of references) {
       const decoratorArgs = reference.getDecorator("Ref")?.getArguments() || [];
-      const refName = decoratorArgs[0]?.getText().replaceAll("\"", "") ?? reference.getName();
+      const refName = decoratorArgs[0]?.getText().replace(/"/g, "") ?? reference.getName();
 
       computedObject.addMethod({
         name: reference.getName(),

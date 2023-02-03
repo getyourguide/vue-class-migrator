@@ -82,8 +82,8 @@ export default (migratePartProps: MigratePartProps) => {
       // @Action("showActivityPageAlert", { namespace: "activity" })
       // setShowAlert!: (show: boolean) => void;
 
-      const actionName = (namespace ? [namespace, methodName].join("/") : methodName).replaceAll(
-        '"',
+      const actionName = (namespace ? [namespace, methodName].join("/") : methodName).replace(
+        /"/g,
         "",
       );
 
