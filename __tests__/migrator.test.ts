@@ -913,7 +913,7 @@ describe("migrateFile()", () => {
                 })
                 export default class Test extends Vue {
                     hello = true;
-                    goodbye: string;
+                    goodbye: string = "goodbye";
                     salutation: {
                         show: string
                     }
@@ -930,7 +930,7 @@ describe("migrateFile()", () => {
                             const salutation: {
                                 show: string
                             } = undefined;
-                            const goodbye: string = undefined;
+                            const goodbye: string = "goodbye";
 
                             return {
                                 sun,

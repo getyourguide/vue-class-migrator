@@ -5,7 +5,6 @@ import {
   VariableDeclarationKind
 } from "ts-morph";
 import { MigratePartProps } from "./migrator";
-import * as console from "console";
 
 // TODO Add support for @Component({data() ...})
 export default (migratePartProps: MigratePartProps) => {
@@ -76,7 +75,6 @@ export default (migratePartProps: MigratePartProps) => {
         returnObject.addPropertyAssignment({
           name: propertyData.getName(),
           initializer: propertyData.getInitializer()?.getText() ?? "undefined",
-          trailingTrivia: typeNode ? ` as ${typeNode}` : undefined,
         });
       }
     }
