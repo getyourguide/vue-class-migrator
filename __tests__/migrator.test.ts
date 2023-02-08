@@ -738,8 +738,10 @@ describe("migrateFile()", () => {
 
                     export default defineComponent({
                         data() {
+                            const myProp: number = undefined;
+                        
                             return {
-                                myProp: undefined as number,
+                                myProp,
                                 myProp2: undefined,
                                 myProp3: false
                             };
@@ -828,12 +830,69 @@ describe("migrateFile()", () => {
 
                     export default defineComponent({
                         data() {
+                            const goodbye: string = undefined;
+                            
                             return {
                                 sun,
                                 moon: false,
                                 hello: true,
-                                goodbye: undefined as string
+                                goodbye
                             }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+        test('sectionData test', async () => {
+            const sourceFile = createSourceFile(
+                `@Component()
+                export default class Test extends Vue {
+                        data: SectionData = {
+                                form: {
+                                ref: "tourTranslationVolumeForm",
+                                valid: true,
+                                dialog: {
+                                    creating: true,
+                                    open: false,
+                                    loading: false,
+                                    tour_count: 0,
+                                    min_score: 0,
+                                    use_tours_per_week: false,
+                                    language_id: 0,
+                                    language_name: "",
+                                    },
+                                },
+                        };
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent } from "vue";
+
+                    export default defineComponent({
+                        data() {
+                                    const data: SectionData = {
+                                            form: {
+                                                ref: "tourTranslationVolumeForm",
+                                                valid: true,
+                                                dialog: {
+                                                creating: true,
+                                                open: false,
+                                                loading: false,
+                                                tour_count: 0,
+                                                min_score: 0,
+                                                use_tours_per_week: false,
+                                                language_id: 0,
+                                                language_name: "",
+                                                },
+                                              },
+                                            };
+                                            
+                                    return {
+                                    data
+                                    };
                         }
                     })`
                         .replaceAll("  ", "")
@@ -868,16 +927,19 @@ describe("migrateFile()", () => {
 
                     export default defineComponent({
                         data() {
+                            const salutation: {
+                                show: string
+                            } = undefined;
+                            const goodbye: string = undefined;
+
                             return {
                                 sun,
                                 moon: {
                                     out: false
                                 },
                                 hello: true,
-                                goodbye: undefined as string,
-                                salutation: undefined as {
-                                    show: string
-                                }
+                                goodbye,
+                                salutation
                             }
                         }
                     })`

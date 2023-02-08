@@ -26,6 +26,6 @@ In most cases, the tool will output errors if it finds something in the class co
 
 ## Migration workflow recommendation
 
-Don't use `--sfc` since the beginning, first run the tool without it and compare the changes on the ts files with your source control, if you are happy with the changes discard all the changes and run it again with `-sfc`.
+Don't use `--sfc` since the beginning, first run the tool without it and compare the changes on the ts files with your source control, if you are happy with the changes discard all the changes and run it again with `--sfc`.
 
 
