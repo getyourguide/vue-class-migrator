@@ -813,7 +813,7 @@ describe("migrateFile()", () => {
                 `@Component()
                 export default class Test extends Vue {
                     hello = true;
-                    goodbye: string;
+                    goodbye: string = "goodbye";
                     data() {
                         return {
                             sun,
@@ -830,7 +830,7 @@ describe("migrateFile()", () => {
 
                     export default defineComponent({
                         data() {
-                            const goodbye: string = undefined;
+                            const goodbye: string = "goodbye";
                             
                             return {
                                 sun,
