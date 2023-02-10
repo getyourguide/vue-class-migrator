@@ -391,6 +391,32 @@ describe("migrateFile()", () => {
                 );
         });
 
+        test('Vuex @Prop become props with Array type', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    @Prop
+                    checkId: MyCheckId[];
+                    
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent, PropType } from "vue";
+    
+                    export default defineComponent({
+                        props: {
+                            checkId: {
+                                type: Array as PropType<MyCheckId[]>
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
+
         test('Vuex @Prop with default become props', async () => {
             const sourceFile = createSourceFile(
                 `@Component
