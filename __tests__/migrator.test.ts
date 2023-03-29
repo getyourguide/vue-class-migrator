@@ -62,7 +62,7 @@ describe("migrateFile()", () => {
 
         await expect(migrateFile(project, sourceFile))
             .rejects
-            .toThrow('Property on @Component \"weird\" not supported.');
+            .toThrow('Property on @Component "weird" not supported.');
     });
 
     describe('Imports & Exports', () => {
@@ -1018,6 +1018,38 @@ describe("migrateFile()", () => {
                 .toThrow("Having a class with the data() method and the @Component({data(): ...} at the same time is not supported.");
         });
 
+    })
+
+
+    describe('Component references', () => {
+        test('@Model ', async () => {
+            const sourceFile = createSourceFile(
+                `@Component
+                export default class Test extends Vue {
+                    @Model('change', {type: Boolean})
+                    checked: boolean;
+                }`
+                    .replaceAll("  ", ""));
+
+            const migratedFile = await migrateFile(project, sourceFile);
+            expect(migratedFile.getText().replaceAll("  ", ""))
+                .toBe(
+                    `import { defineComponent, PropType } from "vue";
+
+                    export default defineComponent({
+                        model: {
+                            prop: "checked",
+                            event: "change"
+                        },
+                        props: {
+                            checked: {
+                                type: Boolean
+                            }
+                        }
+                    })`
+                        .replaceAll("  ", "")
+                );
+        });
     })
 
 

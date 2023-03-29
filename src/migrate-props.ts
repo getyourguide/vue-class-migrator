@@ -4,7 +4,7 @@ import { getObjectProperty, MigratePartProps, supportedPropDecoratorProps } from
 export default (migratePartProps: MigratePartProps) => {
   const { clazz, mainObject, outFile } = migratePartProps;
   // Props
-  const props = clazz.getProperties().filter((prop) => prop.getDecorator("Prop"));
+  const props = clazz.getProperties().filter((prop) => prop.getDecorator("Prop") || prop.getDecorator("Model"));
 
   if (props.length) {
 
@@ -21,7 +21,7 @@ export default (migratePartProps: MigratePartProps) => {
         })
         .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression)!;
 
-      const argument = componentProp.getDecorator("Prop")?.getArguments()[0];
+      const argument = componentProp.getDecorator("Prop")?.getArguments()[0] ?? componentProp.getDecorator("Model")?.getArguments()[1];
       let propertyType: string | undefined;
       if (argument) {
         argument.asKindOrThrow(SyntaxKind.ObjectLiteralExpression)

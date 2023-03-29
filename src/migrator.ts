@@ -16,6 +16,7 @@ import migrateWatchers from "./migrate-watchers";
 import migrateExtends from "./migrate-extends";
 import { getScriptContent, injectScript, vueFileToSFC } from "./migrator-to-sfc";
 import migrateSetters from "./migrate-setters";
+import migrateModels from "./migrate-model";
 import migrateRefs from "./migrate-refs";
 
 export interface MigratePartProps {
@@ -42,7 +43,7 @@ export const specialMethods = [
   "serverPrefetch",
   "destroyed"
 ]; // Vue methods that won't be included under methods: {...}, they go to the root.
-export const supportedDecorators = ["Prop", "Getter", "Action", "Ref"]; // Class Property decorators
+export const supportedDecorators = ["Prop", "Getter", "Action", "Ref", "Model"]; // Class Property decorators
 export const supportedComponentProps = ["name", "components", "methods", "mixins", "store", "props", "data", "computed"]; // @Component properties, empty ignored. e.g. props: {}
 export const supportedPropDecoratorProps = ["default", "required", "type"]; // @Prop("", {...})
 export const supportedGetterOptions = ["namespace"]; // @Getter("", {...})
@@ -142,6 +143,9 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
     // Class Extends
     migrateExtends(migratePartProps);
 
+    // @Model
+    migrateModels(migratePartProps);
+
     // Props Property
     migrateProps(migratePartProps);
 
@@ -161,6 +165,7 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
 
     // @Ref
     migrateRefs(migratePartProps);
+    
   } catch (error) {
     await outFile.deleteImmediately();
     throw error;
