@@ -13,8 +13,4 @@ module.exports = {
     sourceType: "module",
   },
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
-  rules: {
-    "@typescript-eslint/no-non-null-assertion": 0,
-    "@typescript-eslint/no-explicit-any": 0,
-  },
 };

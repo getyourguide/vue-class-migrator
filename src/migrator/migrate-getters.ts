@@ -1,4 +1,4 @@
-import { SyntaxKind, ObjectLiteralExpression } from "ts-morph";
+import { SyntaxKind } from "ts-morph";
 import { MigratePartProps } from "./migrator";
 import { addPropertyObject, getObjectProperty } from "./utils";
 
