@@ -1,10 +1,10 @@
-import { ParameterDeclarationStructure, StructureKind } from "ts-morph";
+import { ParameterDeclarationStructure, StructureKind, SyntaxKind } from "ts-morph";
+import { getObjectProperty } from "./utils";
 import {
-  getObjectProperty,
   MigratePartProps,
   specialMethods,
-  supportedActionOptions,
 } from "./migrator";
+export const supportedActionOptions = ["namespace"]; // @Action("", {...})
 
 export default (migratePartProps: MigratePartProps) => {
   const { clazz, mainObject } = migratePartProps;
@@ -12,7 +12,7 @@ export default (migratePartProps: MigratePartProps) => {
   specialMethods
     .filter((m) => clazz.getMethod(m))
     .forEach((m) => {
-      const method = clazz.getMethod(m)!;
+      const method = clazz.getMethodOrThrow(m);
       const typeNode = method.getReturnTypeNode()?.getText();
       mainObject.addMethod({
         name: method.getName(),
@@ -60,38 +60,30 @@ export default (migratePartProps: MigratePartProps) => {
     const methodsObject = getObjectProperty(mainObject, "methods");
 
     vuexActions.forEach((vuexAction) => {
-      const decoratorArgs = vuexAction.getDecorator("Action")?.getArguments() || [];
-      let methodName: string;
-      if (!decoratorArgs.length) {
-        // @Action: In this case the name of the property is the property name.
-        methodName = vuexAction.getName();
-      } else {
-        methodName = decoratorArgs[0].getText();
-      }
-      let namespace: string | undefined;
-      const actionOptions = (decoratorArgs[1] as any)?.getProperties() || [];
-
-      actionOptions.forEach((prop: any) => {
-        if (!supportedActionOptions.includes(prop.getName())) {
+      const decoratorArgs = vuexAction.getDecoratorOrThrow("Action").getArguments();
+      const methodName = decoratorArgs[0]?.getText().slice(1, -1) ?? vuexAction.getName();
+      const actionOptions = decoratorArgs[1]?.asKindOrThrow(SyntaxKind.ObjectLiteralExpression);
+      const namespace = actionOptions?.getProperty("namespace")
+        ?.asKindOrThrow(SyntaxKind.PropertyAssignment)
+        .getInitializerOrThrow()
+        .getText()
+        .slice(1, -1);
+      
+        actionOptions?.getProperties().forEach((prop) => {
+        if (prop.isKind(SyntaxKind.PropertyAssignment) && !supportedActionOptions.includes(prop.getName())) {
           throw new Error(`@Action option ${prop.getName()} not supported.`);
         }
-        namespace = prop.getInitializerOrThrow().getText();
       });
 
-      // TODO Action type
-      // @Action("showActivityPageAlert", { namespace: "activity" })
-      // setShowAlert!: (show: boolean) => void;
-
-      const actionName = (namespace ? [namespace, methodName].join("/") : methodName).replace(
-        /"/g,
-        "",
+      const actionName = (
+        namespace ? [namespace, methodName].join("/") : methodName
       );
 
       // The property type is a function or any. the function params are the params that the method should take
 
       const callSignature = vuexAction.getType().getCallSignatures()[0];
       let params: ParameterDeclarationStructure[] | undefined;
-      let returnType = undefined;
+      let returnType = undefined as string | undefined;
       let paramVars: string[] = [];
       if (callSignature) {
         // The function has paramenters
@@ -115,11 +107,11 @@ export default (migratePartProps: MigratePartProps) => {
 
       const dispatchParameters = [`"${actionName}"`, ...paramVars].join(", ");
 
-      methodsObject!.addMethod({
+      methodsObject.addMethod({
         name: vuexAction.getName(),
         parameters: params,
         returnType: returnType,
-        statements: `return this.$store.dispatch(${dispatchParameters});`, // TODO
+        statements: `return this.$store.dispatch(${dispatchParameters});`,
       });
     });
   }

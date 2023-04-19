@@ -104,3 +104,4 @@ dist
 .tern-port
 
 .pnpm-store
+.DS_Store

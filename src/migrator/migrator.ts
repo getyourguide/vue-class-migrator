@@ -6,9 +6,11 @@ import {
   ObjectLiteralExpression,
   SourceFile,
 } from "ts-morph";
-import migrateComponentDecorator from "./migrate-component-decorator";
+import { logger } from "./logger";
+import { getDefineComponentInit } from "./migrate-component-decorator";
 import migrateImports from "./migrate-imports";
 import migrateProps from "./migrate-props";
+import migratePropSync from "./migrate-prop-sync";
 import migrateData from "./migrate-data";
 import migrateMethods from "./migrate-methods";
 import migrateGetters from "./migrate-getters";
@@ -43,30 +45,7 @@ export const specialMethods = [
   "serverPrefetch",
   "destroyed"
 ]; // Vue methods that won't be included under methods: {...}, they go to the root.
-export const supportedDecorators = ["Prop", "Getter", "Action", "Ref", "Model"]; // Class Property decorators
-export const supportedComponentProps = ["name", "components", "methods", "mixins", "store", "props", "data", "computed"]; // @Component properties, empty ignored. e.g. props: {}
-export const supportedPropDecoratorProps = ["default", "required", "type"]; // @Prop("", {...})
-export const supportedGetterOptions = ["namespace"]; // @Getter("", {...})
-export const supportedActionOptions = ["namespace"]; // @Action("", {...})
-
-export const getObjectProperty = (
-  mainObject: ObjectLiteralExpression,
-  property: string,
-): ObjectLiteralExpression => {
-  const computedObject = mainObject
-    .getProperty(property)
-    ?.getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression);
-  if (computedObject) {
-    return computedObject;
-  }
-
-  return mainObject
-    .addPropertyAssignment({
-      name: property,
-      initializer: "{}",
-    })
-    .getFirstDescendantByKind(SyntaxKind.ObjectLiteralExpression)!;
-};
+export const supportedDecorators = ["Prop", "PropSync", "Getter", "Action", "Ref", "Model", "Watch"]; // Class Property decorators
 
 const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
   const filePath = sourceFile.getFilePath();
@@ -99,13 +78,14 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
         }
       });
 
+    const defineComponentInitObject = getDefineComponentInit(sourceFileClass);
     let clazzReplacement: string;
     if (!outClazz.getDefaultKeyword()) {
       // Non default exported class
       clazzReplacement = [
         outClazz?.getExportKeyword()?.getText(),
         `const ${outClazz.getName()} =`,
-        "defineComponent({})",
+        `defineComponent(${defineComponentInitObject})`,
       ]
         .filter((s) => s)
         .join(" ");
@@ -113,7 +93,7 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
       clazzReplacement = [
         outClazz?.getExportKeyword()?.getText(),
         outClazz?.getDefaultKeywordOrThrow()?.getText(),
-        "defineComponent({})",
+        `defineComponent(${defineComponentInitObject})`,
       ]
         .filter((s) => s)
         .join(" ");
@@ -137,9 +117,6 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
       sourceFile,
     };
 
-    // @Component Decorator
-    migrateComponentDecorator(migratePartProps);
-
     // Class Extends
     migrateExtends(migratePartProps);
 
@@ -148,6 +125,9 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
 
     // Props Property
     migrateProps(migratePartProps);
+
+    // @PropSync
+    migratePropSync(migratePartProps);
 
     // Data Property
     migrateData(migratePartProps);
@@ -165,7 +145,7 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile) => {
 
     // @Ref
     migrateRefs(migratePartProps);
-    
+
   } catch (error) {
     await outFile.deleteImmediately();
     throw error;
@@ -197,7 +177,7 @@ const migrateVueFile = async (project: Project, vueSourceFile: SourceFile) => {
 };
 
 export const migrateFile = async (project: Project, sourceFile: SourceFile) => {
-  console.log(`Migrating ${sourceFile.getBaseName()}`);
+  logger.info(`Migrating ${sourceFile.getBaseName()}`);
   if (!sourceFile.getText().includes("@Component")) {
     throw new Error("File already migrated");
   }
@@ -235,7 +215,7 @@ export const migrateDirectory = async (directoryPath: string, toSFC: boolean) =>
         file.getText().includes("@Component"),
     );
 
-  console.log(
+  logger.info(
     `Migrating directory: ${directoryToMigrate}, ${finalFilesToMigrate.length} Files needs migration`,
   );
 
@@ -243,7 +223,7 @@ export const migrateDirectory = async (directoryPath: string, toSFC: boolean) =>
     try {
       await migrateFile(project, sourceFile);
     } catch (error) {
-      console.error(`Error migrating ${sourceFile.getFilePath()}: `, error);
+      logger.error(`Error migrating ${sourceFile.getFilePath()}: `, error);
       return;
     }
   }
@@ -256,7 +236,7 @@ export const migrateDirectory = async (directoryPath: string, toSFC: boolean) =>
           [".vue"].includes(file.getExtension()),
       );
 
-    console.log(`Migrating directory: ${directoryToMigrate}, files to SFC`);
+    logger.info(`Migrating directory: ${directoryToMigrate}, files to SFC`);
     await Promise.all(vueFiles.map((f) => vueFileToSFC(project, f)));
   }
 };

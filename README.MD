@@ -11,9 +11,8 @@ Accepted options
 - --sfc: (Optional flag, default: false) Removes original ts and scss files and generates a final vue SFC.
 
 ```
-// e.g. Assuming gygadmin repository being a sibling of vue-migrator.
-pnpm install
-pnpm run migrate -- -d ../gygadmin/apps/catalog/client/pages/views/activities/detail/components
+npm install
+vue-class-migrator -d ./mycomponentdirectory
 ```
 
 ### Considerations

@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import { migrateDirectory } from "./migrator";
 
-// pnpm run migrate-file -- -d "apps/catalog"
 const program = new Command()
   .requiredOption("-d, --directory <string>", "Directory to migrate")
   .option(

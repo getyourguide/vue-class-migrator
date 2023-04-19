@@ -1,4 +1,5 @@
-import { getObjectProperty, MigratePartProps } from "./migrator";
+import { getObjectProperty } from "./utils";
+import { MigratePartProps } from "./migrator";
 
 export default (migratePartProps: MigratePartProps) => {
   const { clazz, mainObject } = migratePartProps;

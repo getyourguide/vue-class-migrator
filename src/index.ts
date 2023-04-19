@@ -1,1 +1,1 @@
-export * as migratorCLI from "./migrator-cli";
+export { default as migratorCLI } from "./migrator-cli";
