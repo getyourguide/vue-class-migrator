@@ -5,6 +5,9 @@
   "bin": {
     "vue-class-migrator": "./dist/index.js"
   },
+  "engines": {
+    "node": "18"
+  },
   "scripts": {
     "migrate": "ts-node src/index.ts",
     "build": "npx tsc",
