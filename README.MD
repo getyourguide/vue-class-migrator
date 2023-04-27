@@ -28,3 +28,36 @@ In most cases, the tool will output errors if it finds something in the class co
 Don't use `--sfc` since the beginning, first run the tool without it and compare the changes on the ts files with your source control, if you are happy with the changes discard all the changes and run it again with `--sfc`.
 
 
+## Compatibility note
+
+In addition to migrating the class to the defineComponent format, vue-migrator also migrates the following libraries out of the box.
+
+### vuex-class
+
+|Decorator|Support|
+|---|---|
+|@State|❌ Not yet|
+|@Getter|✅|
+|@Action|✅|
+|@Mutation|✅|
+
+
+### vue-property-decorator
+
+|Decorator|Support|
+|---|---|
+|@Prop|✅|
+|@PropSync|✅|
+|@Model|✅|
+|@ModelSync|❌ Not yet|
+|@Watch|✅|
+|@Provide|❌ Not yet|
+|@Inject|❌ Not yet|
+|@ProvideReactive|❌ Not yet|
+|@InjectReactive|❌ Not yet|
+|@Emit|❌ Not yet|
+|@Ref|✅|
+|@VModel|❌ Not yet|
+|@Component|✅|
+|@Mixins|✅|
+
