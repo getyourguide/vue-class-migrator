@@ -12,7 +12,7 @@ Accepted options
 
 ```
 npm install
-vue-class-migrator -d ./mycomponentdirectory
+npm run migrate -- -d <your_path>
 ```
 
 ### Considerations
