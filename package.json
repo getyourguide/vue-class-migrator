@@ -30,7 +30,7 @@
     "migrate"
   ],
   "devDependencies": {
-    "@types/eslint": "8.44.0",
+    "@types/eslint": "8.44.1",
     "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
