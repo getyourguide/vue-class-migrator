@@ -1,6 +1,6 @@
 {
   "name": "vue-class-migrator",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Victor Cuena Garcia <victor.cuenagarcia@getyourguide.com>",
   "description": "CLI tool to help migrating vue class components to vue 3 compatible components.",
   "bin": {
