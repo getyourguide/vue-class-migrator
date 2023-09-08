@@ -4,13 +4,17 @@ updates:
     directory: /
     schedule:
       interval: weekly
+      day: sunday
+      timezone: Europe/Berlin
     commit-message:
       prefix: '[SKIP CI] '
     open-pull-requests-limit: 10
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
+      day: sunday
+      timezone: Europe/Berlin
     commit-message:
       prefix: '[BUILD] '
     open-pull-requests-limit: 10
