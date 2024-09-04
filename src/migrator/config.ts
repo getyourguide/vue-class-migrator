@@ -16,6 +16,7 @@ export const vueSpecialMethods = [
   'activated',
   'deactivated',
   'serverPrefetch',
+  'beforeDestroy',
   'destroyed',
 ]; // Vue methods that won't be included under methods: {...}, they go to the root.
 
