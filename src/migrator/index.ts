@@ -2,5 +2,5 @@ export {
   migrateDirectory,
   migrateFile,
   migrate,
-  migrateSingeFile,
+  migrateSingleFile,
 } from './migrator';

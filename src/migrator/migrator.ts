@@ -132,7 +132,7 @@ export const migrateDirectory = async (directoryPath: string, toSFC: boolean) =>
   }
 };
 
-export const migrateSingeFile = async (filePath: string, toSFC: boolean): Promise<void> => {
+export const migrateSingleFile = async (filePath: string, toSFC: boolean): Promise<void> => {
   const fileExtensionPattern = /.+\.(vue|ts)$/;
   if (!fileExtensionPattern.test(filePath)) {
     logger.info(`${filePath} can not migrate. Only .vue files are supported.`);
@@ -141,12 +141,10 @@ export const migrateSingeFile = async (filePath: string, toSFC: boolean): Promis
 
   const fileToMigrate = path.join(process.cwd(), filePath);
   const project = new Project({});
-  project.addSourceFilesAtPaths(fileToMigrate);
+  project.addSourceFileAtPath(fileToMigrate);
   const sourceFiles = project.getSourceFiles();
 
-  logger.info(
-    `Migrating file: ${fileToMigrate}`,
-  );
+  logger.info(`Migrating file: ${fileToMigrate}`);
 
   const migrationPromises = migrateEachFile(sourceFiles, project);
   try {
@@ -171,7 +169,7 @@ export const migrate = async (option: any): Promise<void> => {
   const result = new OptionParser(option).parse();
   if (Object.keys(result).includes('file')) {
     const fileModeOption = result as FileModeOption;
-    migrateSingeFile(fileModeOption.file, (fileModeOption.sfc ?? false));
+    migrateSingleFile(fileModeOption.file, (fileModeOption.sfc ?? false));
   } else {
     const directoryModeOption = result as DirectoryModeOption;
     migrateDirectory(directoryModeOption.directory, (directoryModeOption.sfc ?? false));
