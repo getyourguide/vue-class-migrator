@@ -9,6 +9,9 @@ import migrateVueClassProperties from './vue-property-decorator';
 import migrateVuexDecorators from './vuex';
 import { getScriptContent, injectScript, vueFileToSFC } from './migrator-to-sfc';
 import { createMigrationManager } from './migratorManager';
+import {
+  canBeCliOptions, DirectoryModeOption, FileModeOption, OptionParser,
+} from './option';
 
 const migrateTsFile = async (project: Project, sourceFile: SourceFile): Promise<SourceFile> => {
   const filePath = sourceFile.getFilePath();
@@ -52,7 +55,10 @@ const migrateVueFile = async (project: Project, vueSourceFile: SourceFile) => {
   }
 };
 
-export const migrateFile = async (project: Project, sourceFile: SourceFile) => {
+export const migrateFile = async (
+  project: Project,
+  sourceFile: SourceFile,
+): Promise<SourceFile> => {
   logger.info(`Migrating ${sourceFile.getBaseName()}`);
   if (!sourceFile.getText().includes('@Component')) {
     throw new Error('File already migrated');
@@ -69,6 +75,20 @@ export const migrateFile = async (project: Project, sourceFile: SourceFile) => {
   }
 
   throw new Error(`Extension ${ext} not supported`);
+};
+
+const migrateEachFile = (
+  filesToMigrate: SourceFile[],
+  project: Project,
+): Promise<SourceFile>[] => {
+  const resolveFileMigration = (s: SourceFile, p: Project) => migrateFile(p, s)
+    .catch((err) => {
+      logger.error(`Error migrating ${s.getFilePath()}`);
+      logger.error(err);
+      return Promise.reject(err);
+    });
+
+  return filesToMigrate.map((sourceFile) => resolveFileMigration(sourceFile, project));
 };
 
 export const migrateDirectory = async (directoryPath: string, toSFC: boolean) => {
@@ -92,13 +112,7 @@ export const migrateDirectory = async (directoryPath: string, toSFC: boolean) =>
     `Migrating directory: ${directoryToMigrate}, ${finalFilesToMigrate.length} Files needs migration`,
   );
 
-  const migrationPromises = finalFilesToMigrate
-    .map((sourceFile) => migrateFile(project, sourceFile)
-      .catch((err) => {
-        logger.error(`Error migrating ${sourceFile.getFilePath()}`);
-        logger.error(err);
-        return Promise.reject(err);
-      }));
+  const migrationPromises = migrateEachFile(finalFilesToMigrate, project);
 
   try {
     await Promise.all(migrationPromises);
@@ -115,5 +129,51 @@ export const migrateDirectory = async (directoryPath: string, toSFC: boolean) =>
 
     logger.info(`Migrating directory: ${directoryToMigrate}, files to SFC`);
     await Promise.all(vueFiles.map((f) => vueFileToSFC(project, f)));
+  }
+};
+
+export const migrateSingeFile = async (filePath: string, toSFC: boolean): Promise<void> => {
+  const fileExtensionPattern = /.+\.(vue|ts)$/;
+  if (!fileExtensionPattern.test(filePath)) {
+    logger.info(`${filePath} can not migrate. Only .vue files are supported.`);
+    return;
+  }
+
+  const fileToMigrate = path.join(process.cwd(), filePath);
+  const project = new Project({});
+  project.addSourceFilesAtPaths(fileToMigrate);
+  const sourceFiles = project.getSourceFiles();
+
+  logger.info(
+    `Migrating file: ${fileToMigrate}`,
+  );
+
+  const migrationPromises = migrateEachFile(sourceFiles, project);
+  try {
+    await Promise.all(migrationPromises);
+  } catch (error) {
+    return;
+  }
+
+  if (toSFC) {
+    logger.info(`Migrating file: ${fileToMigrate}, files to SFC`);
+    await Promise.all(sourceFiles.map((f) => vueFileToSFC(project, f)));
+  }
+};
+
+/**
+ * Entry function to start migration
+ */
+export const migrate = async (option: any): Promise<void> => {
+  if (!canBeCliOptions(option)) {
+    throw new Error('Cli option should be provided. Run --help for more info');
+  }
+  const result = new OptionParser(option).parse();
+  if (Object.keys(result).includes('file')) {
+    const fileModeOption = result as FileModeOption;
+    migrateSingeFile(fileModeOption.file, (fileModeOption.sfc ?? false));
+  } else {
+    const directoryModeOption = result as DirectoryModeOption;
+    migrateDirectory(directoryModeOption.directory, (directoryModeOption.sfc ?? false));
   }
 };
