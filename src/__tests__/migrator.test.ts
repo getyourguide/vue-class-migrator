@@ -1,5 +1,7 @@
+import { Project, SourceFile } from 'ts-morph';
 import { project, createSourceFile } from './utils';
-import { migrateFile } from '../migrator';
+import { migrateFile, migrateSingleFile } from '../migrator';
+import * as migrator from '../migrator/migrator';
 
 describe('migrateFile()', () => {
   afterAll(() => {
@@ -88,6 +90,70 @@ describe('migrateFile()', () => {
           'import Vue, { mounted, defineComponent } from "vue";',
           'export default defineComponent({})',
         ].join('\n'));
+    });
+
+    test('Vue import respected in .vue file', async () => {
+      const sourceFile = createSourceFile([
+        '<script lang="ts">',
+        'import Vue, { mounted } from "vue";',
+        '@Component',
+        'export default class {}',
+        '</script>',
+      ].join('\n'), 'vue');
+
+      const migratedFile = await migrateFile(project, sourceFile);
+      expect(migratedFile.getText())
+        .toBe([
+          '<script lang="ts">',
+          'import Vue, { mounted, defineComponent } from "vue";',
+          'export default defineComponent({})',
+          '',
+          '</script>',
+        ].join('\n'));
+    });
+  });
+});
+
+describe('migrateSingleFile()', () => {
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  describe('when a file path is neither .vue nor .ts file', () => {
+    let migrateFileSpy: jest.SpyInstance;
+    beforeEach(() => {
+      migrateFileSpy = jest.spyOn(migrator, 'migrateFile');
+    });
+
+    test('should not call `migrateFile`', async () => {
+      await migrateSingleFile('test.txt', false);
+
+      expect(migrateFileSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when a file path is a .vue file', () => {
+    let migrateFileSpy: jest.SpyInstance;
+    const scriptSource = `'<script lang="ts">',
+'import Vue, { mounted } from "vue";',
+'@Component',
+'export default class {}',
+'</script>',
+`;
+    let sourceFile: SourceFile;
+
+    beforeEach(() => {
+      migrateFileSpy = jest.spyOn(migrator, 'migrateFile');
+      process.cwd = jest.fn(() => '/');
+      sourceFile = createSourceFile(scriptSource, 'vue');
+      Project.prototype.addSourceFileAtPath = jest.fn(() => sourceFile);
+      Project.prototype.getSourceFiles = jest.fn(() => [sourceFile]);
+    });
+
+    test('should call `migrateFile`', async () => {
+      await migrateSingleFile(sourceFile.getFilePath(), false);
+
+      expect(migrateFileSpy).toHaveBeenCalledWith(expect.anything(), sourceFile);
     });
   });
 });
