@@ -1,4 +1,4 @@
-import { Project } from 'ts-morph';
+import { Project, SourceFile } from 'ts-morph';
 import { project, createSourceFile } from './utils';
 import { migrateFile, migrateSingleFile } from '../migrator';
 import * as migrator from '../migrator/migrator';
@@ -107,6 +107,7 @@ describe('migrateFile()', () => {
           '<script lang="ts">',
           'import Vue, { mounted, defineComponent } from "vue";',
           'export default defineComponent({})',
+          '',
           '</script>',
         ].join('\n'));
     });
@@ -139,11 +140,12 @@ describe('migrateSingleFile()', () => {
 'export default class {}',
 '</script>',
 `;
-    const sourceFile = createSourceFile(scriptSource, 'vue');
+    let sourceFile: SourceFile;
 
     beforeEach(() => {
       migrateFileSpy = jest.spyOn(migrator, 'migrateFile');
       process.cwd = jest.fn(() => '/');
+      sourceFile = createSourceFile(scriptSource, 'vue');
       Project.prototype.addSourceFileAtPath = jest.fn(() => sourceFile);
       Project.prototype.getSourceFiles = jest.fn(() => [sourceFile]);
     });
