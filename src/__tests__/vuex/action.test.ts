@@ -13,7 +13,7 @@ describe('Vuex @Action', () => {
                     reload: any;
                 }`,
       // Results
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     methods: {
@@ -33,7 +33,7 @@ describe('Vuex @Action', () => {
                     reload: any;
                 }`,
       // Results
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     methods: {
@@ -53,7 +53,7 @@ describe('Vuex @Action', () => {
                     reload: any;
                 }`,
       // Results
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     methods: {
@@ -73,7 +73,7 @@ describe('Vuex @Action', () => {
                     reload: (p1: string, p2, p3: number) => number;
                 }`,
       // Results
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     methods: {

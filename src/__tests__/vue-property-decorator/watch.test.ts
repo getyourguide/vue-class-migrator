@@ -13,7 +13,7 @@ describe('@Watch decorator', () => {
                     onChildChanged(val: string) { console.log("onChildChanged"); }
                 }`,
       // Result
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     watch: {
@@ -40,7 +40,7 @@ describe('@Watch decorator', () => {
                     }
                 }`,
       // Result
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     watch: {
@@ -68,7 +68,7 @@ describe('@Watch decorator', () => {
                     }
                 }`,
       // Result
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     watch: {
@@ -99,7 +99,7 @@ describe('@Watch decorator', () => {
                     }
                 }`,
       // Result
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     watch: {
