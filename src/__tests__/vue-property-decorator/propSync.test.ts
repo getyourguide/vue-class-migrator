@@ -13,7 +13,7 @@ describe('@PropSync decorator', () => {
             syncedName;
         }`,
       // Result
-      `import { defineComponent, PropType } from "vue";
+      `import { defineComponent, PropType } from "~/lib/helper/fallback-composition-api";
     
         export default defineComponent({
             props: {
@@ -43,7 +43,7 @@ describe('@PropSync decorator', () => {
                         syncedName: string;
                     }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
     
                     export default defineComponent({
                         props: {
@@ -73,7 +73,7 @@ describe('@PropSync decorator', () => {
                       syncedName: string | boolean;
                   }`,
       // Result
-      `import { defineComponent, PropType } from "vue";
+      `import { defineComponent, PropType } from "~/lib/helper/fallback-composition-api";
   
                   export default defineComponent({
                       props: {
@@ -103,7 +103,7 @@ describe('@PropSync decorator', () => {
                     syncedName: string;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {
@@ -133,7 +133,7 @@ describe('@PropSync decorator', () => {
                     syncedName: string;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {
@@ -163,7 +163,7 @@ describe('@PropSync decorator', () => {
                     syncedName: string;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {

@@ -42,7 +42,7 @@ describe('migrateFile()', () => {
       const migratedFile = await migrateFile(project, sourceFile);
       expect(migratedFile.getText())
         .toBe([
-          'import { defineComponent } from "vue";\n',
+          'import { defineComponent } from "~/lib/helper/fallback-composition-api";\n',
           'export const Test = defineComponent({})',
         ].join('\n'));
     });
@@ -56,7 +56,7 @@ describe('migrateFile()', () => {
       const migratedFile = await migrateFile(project, sourceFile);
       expect(migratedFile.getText())
         .toBe([
-          'import { defineComponent } from "vue";\n',
+          'import { defineComponent } from "~/lib/helper/fallback-composition-api";\n',
           'export default defineComponent({})',
         ].join('\n'));
     });
@@ -72,14 +72,14 @@ describe('migrateFile()', () => {
       expect(migratedFile.getText())
         .toBe([
           'import Bla, { Blo } from "./blabla"',
-          'import { defineComponent } from "vue";\n',
+          'import { defineComponent } from "~/lib/helper/fallback-composition-api";\n',
           'export default defineComponent({})',
         ].join('\n'));
     });
 
     test('Vue import respected', async () => {
       const sourceFile = createSourceFile([
-        'import Vue, { mounted } from "vue";',
+        'import Vue, { mounted } from "~/lib/helper/fallback-composition-api";',
         '@Component',
         'export default class Test {}',
       ].join('\n'));
@@ -87,7 +87,7 @@ describe('migrateFile()', () => {
       const migratedFile = await migrateFile(project, sourceFile);
       expect(migratedFile.getText())
         .toBe([
-          'import Vue, { mounted, defineComponent } from "vue";',
+          'import Vue, { mounted, defineComponent } from "~/lib/helper/fallback-composition-api";',
           'export default defineComponent({})',
         ].join('\n'));
     });
@@ -95,7 +95,7 @@ describe('migrateFile()', () => {
     test('Vue import respected in .vue file', async () => {
       const sourceFile = createSourceFile([
         '<script lang="ts">',
-        'import Vue, { mounted } from "vue";',
+        'import Vue, { mounted } from "~/lib/helper/fallback-composition-api";',
         '@Component',
         'export default class {}',
         '</script>',
@@ -105,7 +105,7 @@ describe('migrateFile()', () => {
       expect(migratedFile.getText())
         .toBe([
           '<script lang="ts">',
-          'import Vue, { mounted, defineComponent } from "vue";',
+          'import Vue, { mounted, defineComponent } from "~/lib/helper/fallback-composition-api";',
           'export default defineComponent({})',
           '',
           '</script>',
@@ -135,7 +135,7 @@ describe('migrateSingleFile()', () => {
   describe('when a file path is a .vue file', () => {
     let migrateFileSpy: jest.SpyInstance;
     const scriptSource = `'<script lang="ts">',
-'import Vue, { mounted } from "vue";',
+'import Vue, { mounted } from "~/lib/helper/fallback-composition-api";',
 '@Component',
 'export default class {}',
 '</script>',

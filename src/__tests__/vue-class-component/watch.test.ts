@@ -21,7 +21,7 @@ describe('Component watch', () => {
             export default class Test extends Vue {}`,
 
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             export default defineComponent({
                 watch: {
@@ -45,7 +45,7 @@ describe('Component watch', () => {
             })
             export default class Test extends Vue {}`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             export default defineComponent({
                 name: "test",

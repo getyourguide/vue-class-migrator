@@ -200,7 +200,7 @@ export default class MigrationManager {
     fallbackType = isFunction ? 'Function' : fallbackType;
 
     if (!propertyConstructorMapping[propertyType]) {
-      this.addNamedImport('vue', 'PropType');
+      this.addNamedImport('~/lib/helper/fallback-composition-api', 'PropType');
       return `${fallbackType} as PropType<${propertyType}>`;
     }
 
