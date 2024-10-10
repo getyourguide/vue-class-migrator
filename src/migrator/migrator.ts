@@ -1,6 +1,8 @@
 import path from 'path';
 import {
+  IndentationText,
   Project,
+  QuoteKind,
   SourceFile,
 } from 'ts-morph';
 import logger from './logger';
@@ -91,9 +93,16 @@ const migrateEachFile = (
   return filesToMigrate.map((sourceFile) => resolveFileMigration(sourceFile, project));
 };
 
+const createProject = () => new Project({
+  manipulationSettings: {
+    quoteKind: QuoteKind.Single,
+    indentationText: IndentationText.TwoSpaces,
+  },
+});
+
 export const migrateDirectory = async (directoryPath: string, toSFC: boolean) => {
   const directoryToMigrate = path.join(process.cwd(), directoryPath);
-  const project = new Project({});
+  const project = createProject();
 
   project.addSourceFilesAtPaths(`${directoryToMigrate}/**/*.(ts|vue|scss)`)
     .filter((sourceFile) => !['.vue', '.ts'].includes(sourceFile.getExtension())
@@ -140,7 +149,7 @@ export const migrateSingleFile = async (filePath: string, toSFC: boolean): Promi
   }
 
   const fileToMigrate = path.join(process.cwd(), filePath);
-  const project = new Project({});
+  const project = createProject();
   project.addSourceFileAtPath(fileToMigrate);
   const sourceFiles = project.getSourceFiles();
 

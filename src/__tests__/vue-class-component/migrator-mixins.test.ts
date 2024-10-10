@@ -10,7 +10,7 @@ describe('Component extends', () => {
       `@Component
             export default class Test extends AnotherTest {}`,
       // Results
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
             export default defineComponent({
                 extends: AnotherTest
@@ -23,7 +23,7 @@ describe('Component extends', () => {
       `@Component
             export default class Test extends AnotherTest {}`,
       // Results
-      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+      `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
             export default defineComponent({
                 extends: AnotherTest

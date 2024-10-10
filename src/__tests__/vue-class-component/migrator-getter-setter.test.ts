@@ -15,7 +15,7 @@ describe('Data Property Migration', () => {
                       }
                 }`,
         // Results
-        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+        `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     computed: {
@@ -38,7 +38,7 @@ describe('Data Property Migration', () => {
                       }
                 }`,
         // Results
-        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+        `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     watch: {
@@ -66,7 +66,7 @@ describe('Data Property Migration', () => {
                     }
                 }`,
         // Results
-        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+        `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     computed: {

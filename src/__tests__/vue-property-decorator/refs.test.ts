@@ -13,7 +13,7 @@ describe('@Ref', () => {
                     @Ref() readonly anotherComponent!: AnotherComponent
                 }`,
         // Result
-        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+        `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     computed: {
@@ -36,7 +36,7 @@ describe('@Ref', () => {
                     readonly defaultInput!: HTMLInputElement;                  
                 }`,
         // Result
-        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+        `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     computed: {
@@ -59,7 +59,7 @@ describe('@Ref', () => {
                     readonly defaultInput!: HTMLInputElement;                  
                 }`,
         // Result
-        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
+        `import { defineComponent } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     computed: {
