@@ -14,7 +14,7 @@ describe('@Prop decorator', () => {
                     
                 }`,
       // Result
-      `import { defineComponent, PropType } from "vue";
+      `import { defineComponent, PropType } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {
@@ -43,7 +43,7 @@ describe('@Prop decorator', () => {
                       permissions!: CommentPermissions;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {
@@ -78,7 +78,7 @@ describe('@Prop decorator', () => {
                     checkId: string;            
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
     
                 export default defineComponent({
                     props: {
@@ -104,7 +104,7 @@ describe('@Prop decorator', () => {
                     
                 }`,
       // Result
-      `import { defineComponent, PropType } from "vue";
+      `import { defineComponent, PropType } from "~/lib/helper/fallback-composition-api";
     
                 export default defineComponent({
                     props: {
@@ -124,7 +124,7 @@ describe('@Prop decorator', () => {
                     checkId: MyCheckId;
                 }`,
       // Result
-      `import { defineComponent, PropType } from "vue";
+      `import { defineComponent, PropType } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {
@@ -147,7 +147,7 @@ describe('@Prop decorator', () => {
                   @Prop([String, Boolean]) readonly propC: string | boolean | undefined
                 }`,
       // Results
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {
@@ -173,7 +173,7 @@ describe('@Prop decorator', () => {
                     checkId: MyCheckId;
                 }`,
       // Results
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     props: {
@@ -191,7 +191,7 @@ describe('@Prop decorator', () => {
                     checkId: string;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
     
                 export default defineComponent({
                     props: {
@@ -209,7 +209,7 @@ describe('@Prop decorator', () => {
                     checkId;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
     
                 export default defineComponent({
                     props: {

@@ -12,7 +12,7 @@ describe('Vuex @Getter', () => {
                     @Getter bar: string | null;
                 }`,
       // Results
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     computed: {
@@ -32,7 +32,7 @@ describe('Vuex @Getter', () => {
                     getItemById!;
                 }`,
       // Results
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     computed: {
@@ -52,7 +52,7 @@ describe('Vuex @Getter', () => {
                     getItemById!;
                 }`,
       // Results
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     computed: {

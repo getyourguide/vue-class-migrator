@@ -13,7 +13,7 @@ describe('@ModelSync decorator', () => {
           readonly checkedValue!
         }`,
       // Result
-      `import { defineComponent, PropType } from "vue";
+      `import { defineComponent, PropType } from "~/lib/helper/fallback-composition-api";
   
         export default defineComponent({
           model: {
@@ -47,7 +47,7 @@ describe('@ModelSync decorator', () => {
           readonly checkedValue!: boolean
         }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
   
         export default defineComponent({
           model: {
@@ -81,7 +81,7 @@ describe('@ModelSync decorator', () => {
           readonly checkedValue!: MyCheckedValue
         }`,
       // Result
-      `import { defineComponent, PropType } from "vue";
+      `import { defineComponent, PropType } from "~/lib/helper/fallback-composition-api";
   
         export default defineComponent({
           model: {
@@ -115,7 +115,7 @@ describe('@ModelSync decorator', () => {
         readonly checkedValue!: boolean
       }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
         export default defineComponent({
           model: {
@@ -149,7 +149,7 @@ describe('@ModelSync decorator', () => {
             readonly checkedValue!: boolean
         }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
         export default defineComponent({
           model: {
@@ -183,7 +183,7 @@ describe('@ModelSync decorator', () => {
             readonly checkedValue!: boolean
         }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
         export default defineComponent({
             model: {

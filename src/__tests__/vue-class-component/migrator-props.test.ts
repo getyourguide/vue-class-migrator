@@ -17,7 +17,7 @@ describe('Component props', () => {
             export default class Test extends Vue {}`,
 
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             const props = {
                 test: 1
@@ -44,7 +44,7 @@ describe('Component props', () => {
             export default class Test extends Vue {}`,
 
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             export default defineComponent({
                 props: {
@@ -67,7 +67,7 @@ describe('Component props', () => {
             })
             export default class Test extends Vue {}`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             export default defineComponent({
                 name: "test",

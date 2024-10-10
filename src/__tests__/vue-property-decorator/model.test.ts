@@ -13,7 +13,7 @@ describe('@Model decorator', () => {
                     checked: boolean;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     model: {
@@ -37,7 +37,7 @@ describe('@Model decorator', () => {
                     checked: boolean;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     model: {
@@ -61,7 +61,7 @@ describe('@Model decorator', () => {
                     checked: boolean;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     model: {
@@ -85,7 +85,7 @@ describe('@Model decorator', () => {
                     checked: boolean;
                 }`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     model: {

@@ -10,7 +10,7 @@ describe('@Component decorator', () => {
       `@Component({})
             class Test {}
             `,
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             const Test = defineComponent({})
         `,
@@ -23,7 +23,7 @@ describe('@Component decorator', () => {
             class Test {}
             `,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             const Test = defineComponent({})
         `,
@@ -37,7 +37,7 @@ describe('@Component decorator', () => {
             })
             export default class Test {}`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             export default defineComponent({
                 mixins: [A,B,C]
@@ -52,7 +52,7 @@ describe('@Component decorator', () => {
             })
             export default class Test extends AnotherClass {}`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             export default defineComponent({
                 mixins: [A,B,C],
@@ -89,7 +89,7 @@ describe('@Component decorator', () => {
             })
             export default class Test extends Vue {}`,
       // Result
-      `import { defineComponent } from "vue";
+      `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
             const beforeCreate = () => {};
             export default defineComponent({

@@ -15,7 +15,7 @@ describe('Methods Property Migration', () => {
                     }
                 }`,
         // Results
-        `import { defineComponent } from "vue";
+        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     created() {
@@ -37,7 +37,7 @@ describe('Methods Property Migration', () => {
                     }
                 }`,
         // Results
-        `import { defineComponent } from "vue";
+        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     created() {
@@ -61,7 +61,7 @@ describe('Methods Property Migration', () => {
                     }
                 }`,
         // Results
-        `import { defineComponent } from "vue";
+        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     methods: {
@@ -84,7 +84,7 @@ describe('Methods Property Migration', () => {
                       }
                 }`,
         // Results
-        `import { defineComponent } from "vue";
+        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     watch: {
@@ -112,7 +112,7 @@ describe('Methods Property Migration', () => {
                     }
                 }`,
         // Results
-        `import { defineComponent } from "vue";
+        `import { defineComponent } from "~/lib/helper/fallback-composition-api";
 
                 export default defineComponent({
                     computed: {
