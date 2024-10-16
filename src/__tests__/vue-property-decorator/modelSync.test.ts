@@ -13,7 +13,7 @@ describe('@ModelSync decorator', () => {
           readonly checkedValue!
         }`,
       // Result
-      `import { defineComponent, PropType } from '~/lib/helper/fallback-composition-api';
+      `import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
   
         export default defineComponent({
           model: {
@@ -81,7 +81,7 @@ describe('@ModelSync decorator', () => {
           readonly checkedValue!: MyCheckedValue
         }`,
       // Result
-      `import { defineComponent, PropType } from '~/lib/helper/fallback-composition-api';
+      `import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
   
         export default defineComponent({
           model: {
