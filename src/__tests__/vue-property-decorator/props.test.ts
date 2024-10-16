@@ -14,7 +14,7 @@ describe('@Prop decorator', () => {
                     
                 }`,
       // Result
-      `import { defineComponent, PropType } from '~/lib/helper/fallback-composition-api';
+      `import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     props: {
@@ -104,7 +104,7 @@ describe('@Prop decorator', () => {
                     
                 }`,
       // Result
-      `import { defineComponent, PropType } from '~/lib/helper/fallback-composition-api';
+      `import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
     
                 export default defineComponent({
                     props: {
@@ -124,7 +124,7 @@ describe('@Prop decorator', () => {
                     checkId: MyCheckId;
                 }`,
       // Result
-      `import { defineComponent, PropType } from '~/lib/helper/fallback-composition-api';
+      `import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
 
                 export default defineComponent({
                     props: {

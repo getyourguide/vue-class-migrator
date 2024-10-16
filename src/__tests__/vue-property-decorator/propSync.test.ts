@@ -13,7 +13,7 @@ describe('@PropSync decorator', () => {
             syncedName;
         }`,
       // Result
-      `import { defineComponent, PropType } from '~/lib/helper/fallback-composition-api';
+      `import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
     
         export default defineComponent({
             props: {
@@ -73,7 +73,7 @@ describe('@PropSync decorator', () => {
                       syncedName: string | boolean;
                   }`,
       // Result
-      `import { defineComponent, PropType } from '~/lib/helper/fallback-composition-api';
+      `import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
   
                   export default defineComponent({
                       props: {

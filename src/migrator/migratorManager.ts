@@ -182,7 +182,7 @@ export default class MigrationManager {
       .getImportDeclaration((imp) => imp.getModuleSpecifierValue() === module);
     if (!importDeclaration?.getNamedImports()
       .some((imp) => imp.getText() === namedImport)) {
-      importDeclaration?.addNamedImport('PropType');
+      importDeclaration?.addNamedImport({ name: 'PropType', isTypeOnly: true });
     }
   }
 
