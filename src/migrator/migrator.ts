@@ -6,8 +6,18 @@ import {
   SourceFile,
 } from 'ts-morph';
 import logger from './logger';
-import migrateVueClassComponent from './vue-class-component';
-import migrateVueClassProperties from './vue-property-decorator';
+import migrateProps from './vue-property-decorator/prop';
+import migratePropSyncs from './vue-property-decorator/propSync';
+import migrateModels from './vue-property-decorator/model';
+import migrateModelSyncs from './vue-property-decorator/modelSync';
+import migrateRefs from './vue-property-decorator/ref';
+import migrateWatchers from './vue-property-decorator/watch';
+import migrateData from './vue-class-component/migrate-data';
+import migrateExtends from './vue-class-component/migrate-extends';
+import migrateGetters from './vue-class-component/migrate-getters';
+import migrateImports from './vue-class-component/migrate-imports';
+import migrateMethods from './vue-class-component/migrate-methods';
+import migrateSetters from './vue-class-component/migrate-setters';
 import migrateVuexDecorators from './vuex';
 import { getScriptContent, injectScript, vueFileToSFC } from './migrator-to-sfc';
 import { createMigrationManager } from './migratorManager';
@@ -24,8 +34,18 @@ const migrateTsFile = async (project: Project, sourceFile: SourceFile): Promise<
   try {
     const migrationManager = createMigrationManager(sourceFile, outFile);
 
-    migrateVueClassComponent(migrationManager);
-    migrateVueClassProperties(migrationManager);
+    migrateImports(migrationManager.outFile);
+    migrateExtends(migrationManager.clazz, migrationManager.mainObject);
+    migrateProps(migrationManager);
+    migratePropSyncs(migrationManager);
+    migrateData(migrationManager.clazz, migrationManager.mainObject);
+    migrateGetters(migrationManager);
+    migrateSetters(migrationManager.clazz, migrationManager.mainObject);
+    migrateWatchers(migrationManager);
+    migrateMethods(migrationManager.clazz, migrationManager.mainObject);
+    migrateModels(migrationManager);
+    migrateModelSyncs(migrationManager);
+    migrateRefs(migrationManager);
     migrateVuexDecorators(migrationManager);
   } catch (error) {
     await outFile.deleteImmediately();

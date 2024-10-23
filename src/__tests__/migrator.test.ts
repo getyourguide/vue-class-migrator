@@ -138,6 +138,109 @@ describe('migrateFile()', () => {
         ].join('\n'));
     });
   });
+
+  describe('Props orders', () => {
+    test('Mixins, props and data are moved to the top', async () => {
+      const sourceFile = createSourceFile(`<script lang="ts">
+import { CommentType } from '~/lib/types'
+import { BaseMixin, mixins } from '~/lib/mixins'
+import { Component, Prop, Watch } from 'nuxt-proprty-decorator'
+
+@Component({
+  components: {}
+})
+export default class extends mixins(BaseMixin) {
+  val: string | null = null
+
+  @Prop({ type: String })
+  value?: string
+
+  @Prop({ required: true,  })
+  readonly commentType: CommentType
+
+  @Prop({ default: true })
+  isRequired?: boolean
+
+  get typeClasses() {
+    return this.commentType === CommentType.REQUIRED ? 'danger' : 'primary'
+  }
+
+  @Watch('purchaseComment')
+  watchPurchaseComment() {
+    this.init()
+  }
+
+  mounted() {
+    this.init()
+  }
+
+  init() {
+    this.val = this.value || ''
+  }
+
+  input() {
+    this.$emit('input', this.val)
+    this.$emit('change', this.val)
+  }
+}
+</script>`, 'vue');
+      const migratedFile = await migrateFile(project, sourceFile);
+      expect(migratedFile.getText())
+        .toBe(`<script lang="ts">
+import { CommentType } from '~/lib/types'
+import { BaseMixin, mixins } from '~/lib/mixins'
+import { Component, Prop, Watch } from 'nuxt-proprty-decorator'
+import { defineComponent, type PropType } from '~/lib/helper/fallback-composition-api';
+
+export default defineComponent({
+  components: {},
+  mixins: [BaseMixin],
+  props: {
+    value: { type: String },
+    commentType: { required: true,
+      type: Object as PropType<CommentType>
+    },
+    isRequired: { default: true,
+      type: Boolean
+    }
+  },
+  data() {
+    const val: string | null = null;
+
+    return {
+      val
+    };
+  },
+  computed: {
+    typeClasses() {
+      return this.commentType === CommentType.REQUIRED ? 'danger' : 'primary'
+    }
+  },
+  watch: {
+    "purchaseComment": [{
+      handler: "watchPurchaseComment"
+    }]
+  },
+  methods: {
+    watchPurchaseComment() {
+      this.init()
+    },
+    init() {
+      this.val = this.value || ''
+    },
+    input() {
+      this.$emit('input', this.val)
+      this.$emit('change', this.val)
+    }
+  },
+  mounted() {
+    this.init()
+  }
+})
+
+</script>`);
+    });
+  });
 });
 
 describe('migrateSingleFile()', () => {
