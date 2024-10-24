@@ -13,6 +13,9 @@ describe('Methods Property Migration', () => {
                     created() {
                         console.log("OK");
                     }
+                    beforeDestroy() {
+                        console.log("beforeDestroy triggerd");
+                    }
                 }`,
         // Results
         `import { defineComponent } from "vue";
@@ -20,6 +23,9 @@ describe('Methods Property Migration', () => {
                 export default defineComponent({
                     created() {
                         console.log("OK");
+                    },
+                    beforeDestroy() {
+                        console.log("beforeDestroy triggerd");
                     }
                 })`,
       );
