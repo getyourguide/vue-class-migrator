@@ -33,7 +33,7 @@
     "migrate"
   ],
   "dependencies": {
-    "commander": "^11.0.0",
+    "commander": "^14.0.0",
     "ts-morph": "^24.0.0",
     "winston": "^3.10.0"
   },
