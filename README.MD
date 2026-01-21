@@ -6,7 +6,7 @@
 
 # ⚠️ Status: Archived & No Longer Maintained
 
-**As of 2024, this repository is archived and read-only.** 
+**As of 2026, this repository is archived and read-only.** 
 
 With Vue 2 reaching End of Life (EOL) and the rise of powerful AI coding assistants, we are no longer actively maintaining this tool.
 
