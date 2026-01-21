@@ -4,6 +4,30 @@
 ![npm](https://img.shields.io/npm/v/vue-class-migrator)
 ![npm](https://img.shields.io/npm/dm/vue-class-migrator)
 
+# ⚠️ Status: Archived & No Longer Maintained
+
+**As of 2024, this repository is archived and read-only.** 
+
+With Vue 2 reaching End of Life (EOL) and the rise of powerful AI coding assistants, we are no longer actively maintaining this tool.
+
+### Should I still use this?
+
+**Yes**, but as a **"First Pass"** tool.
+
+While AI (Cursor, Copilot, ChatGPT) is excellent at fixing logic and types, it can be slow and expensive for bulk syntax conversion across hundreds of files. This tool remains the most efficient way to handle the deterministic "heavy lifting" of converting Class syntax to Composition API.
+
+### Recommended Migration Workflow (2024+)
+
+1.  **Bulk Convert:** Run `vue-class-migrator` on your codebase to instantly transform the syntax structure (Decorators, Data, Methods -> `defineComponent`/`setup`).
+2.  **AI Refinement:** Use AI tools to handle the "last mile":
+    *   Fixing TypeScript errors.
+    *   Refactoring complex logic inside `setup()`.
+    *   Migrating obscure edge cases this tool might miss.
+
+---
+
+*(The original documentation follows below)*
+
 
 ## Vue Class Migrator CLI
 
